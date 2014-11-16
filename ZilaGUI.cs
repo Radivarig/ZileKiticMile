@@ -19,18 +19,28 @@ public class ZilaGUI : MonoBehaviour {
 		Vector2 _scr = new Vector2(Screen.width, Screen.height);
 		okvir.position = (_scr -velicinaOkvira)/2f;
 
-		GUILayout.BeginArea(okvir);
-		GUILayout.BeginHorizontal();
+		Rect lijevi = okvir;
+		lijevi.width *= 0.45f;
+
+		Rect srednji = lijevi;
+		srednji.width = okvir.width*0.1f;
+		srednji.x += lijevi.width;
+
+		Rect desni = lijevi;
+		desni.position = new Vector2 (desni.position.x +desni.width + okvir.width*0.1f, desni.position.y);
+
+		GUILayout.BeginArea(lijevi);
 		GUILayout.Label("BPC157");
+		ZileGUI(trakt1);
+		GUILayout.EndArea();
+
+		GUILayout.BeginArea(srednji);
+		OmjerGUI(omjeri);
+		GUILayout.EndArea();
+
+		GUILayout.BeginArea(desni);
 		GUILayout.Label("Kontrola");
-		GUILayout.EndHorizontal();
-		GUILayout.BeginHorizontal();
-		{
-			ZileGUI(trakt1);
-			OmjerGUI(omjeri);
-			ZileGUI(trakt2);
-		}
-		GUILayout.EndHorizontal();
+		ZileGUI(trakt2);
 		GUILayout.EndArea();
 	}
 
@@ -51,6 +61,7 @@ public class ZilaGUI : MonoBehaviour {
 		GUILayout.Label("");	//tip
 		GUILayout.Label("");	//ime
 		GUILayout.Label("");	//zbroj
+		GUILayout.Label("");	//prosjek
 		foreach(float o in omjeri){
 			if(o != 0) GUILayout.Label("omjer: " +o);
 			else GUILayout.Label("null");
