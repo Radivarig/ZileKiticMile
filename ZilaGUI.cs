@@ -1,13 +1,15 @@
 ﻿using UnityEngine;
-using UnityEditor;
 using System.Collections;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
+using System.Runtime.Serialization.Formatters.Binary;
 using System.IO;
 
 [System.Serializable]
 public class ZilaGUI : MonoBehaviour {
-	public Project projekt;
+	public List<Project> projects = new List<Project>();
+	public Project trenutni;
+
 	public string projectPath = "Assets/Saved";
 
 	List<float> omjeri = new List<float>();
@@ -25,29 +27,23 @@ public class ZilaGUI : MonoBehaviour {
 	public Oznaka activeMarker;
 
 	void Update(){
-		if(projekt ==null){
-			projekt = (Project) AssetDatabase.LoadAssetAtPath(projectPath +"/bla.asset", typeof(Project));
-			if(projekt ==null)
-			{
-				projekt = ScriptableObject.CreateInstance<Project>();
-				
-				AssetDatabase.CreateAsset (projekt, projectPath +"/" +"bla.asset");
-				
-				AssetDatabase.SaveAssets ();
-				AssetDatabase.Refresh();
-			}
+		if(trenutni ==null){
+			if(projects.Count == 0) 
+				projects.Add(new Project());
+			trenutni = projects[0];
+
 		}
 		else{
-			if(projekt.trakt1.zile.Count == 0){
-				projekt.trakt1.zile.Add(new Oznaka());
-				projekt.trakt2.zile.Add(new Oznaka());
+			if(trenutni.trakt1.zile.Count == 0){
+				trenutni.trakt1.zile.Add(new Oznaka());
+				trenutni.trakt2.zile.Add(new Oznaka());
 			}
-			omjeri = Omjeri(projekt.trakt1, projekt.trakt2);
+			omjeri = Omjeri(trenutni.trakt1, trenutni.trakt2);
 		}
 	}
 
 	void OnGUI(){
-		if(projekt ==null) return;
+		if(trenutni ==null) return;
 
 		UpdateActiveMarker();
 		BackgroundGUI();
@@ -72,7 +68,7 @@ public class ZilaGUI : MonoBehaviour {
 			GUILayout.Label("BPC157");
 			GUILayout.FlexibleSpace();
 			GUILayout.EndHorizontal();
-			ZileGUI(projekt.trakt1);
+			ZileGUI(trenutni.trakt1);
 			GUILayout.EndArea();
 			
 			GUILayout.BeginArea(srednji);
@@ -85,7 +81,7 @@ public class ZilaGUI : MonoBehaviour {
 			GUILayout.Label("Kontrola");
 			GUILayout.FlexibleSpace();
 			GUILayout.EndHorizontal();
-			ZileGUI(projekt.trakt2);
+			ZileGUI(trenutni.trakt2);
 			GUILayout.EndArea();
 		}
 		GUI.Box(slike, "");
@@ -103,8 +99,8 @@ public class ZilaGUI : MonoBehaviour {
 
 			if(Event.current.isMouse && Event.current.button == 1){
 				Rect aroundMouse = new Rect(Event.current.mousePosition.x, Event.current.mousePosition.y, eraseSize, eraseSize);
-				GiTrakt trakt = projekt.trakt2;
-				if(crtajTrakt1) trakt = projekt.trakt1;
+				GiTrakt trakt = trenutni.trakt2;
+				if(crtajTrakt1) trakt = trenutni.trakt1;
 				foreach(Oznaka oznaka in trakt.zile){
 					for(int i = 0; i < oznaka.pojave.Count; ++i){
 						Vector2 pojava = oznaka.pojave[i];
@@ -115,8 +111,8 @@ public class ZilaGUI : MonoBehaviour {
 				}
 			}
 
-			if(crtajTrakt1) NacrtajPojave(projekt.trakt1.zile);
-			else NacrtajPojave(projekt.trakt2.zile);
+			if(crtajTrakt1) NacrtajPojave(trenutni.trakt1.zile);
+			else NacrtajPojave(trenutni.trakt2.zile);
 			GUILayout.EndHorizontal();
 			GUILayout.EndArea();
 		}
@@ -125,7 +121,7 @@ public class ZilaGUI : MonoBehaviour {
 		{
 			GUILayout.BeginArea(oznake);
 			if(markerToEdit > -1) MarkerEditGUI(markerToEdit);
-			else OznakeGUI(projekt.trakt1, projekt.trakt2);
+			else OznakeGUI(trenutni.trakt1, trenutni.trakt2);
 			GUILayout.EndArea();
 		}
 	}
@@ -133,6 +129,24 @@ public class ZilaGUI : MonoBehaviour {
 	#region funkcije
 	 
 	#region non-GUI
+
+	public void Save() {
+		projects.Add(trenutni);
+		BinaryFormatter bf = new BinaryFormatter();
+		FileStream fs = File.Create (Application.persistentDataPath + "/SavedProjects.zile");
+		bf.Serialize(fs, projects);
+		fs.Close();
+	}   
+	
+	public void Load() {
+		if(File.Exists(Application.persistentDataPath + "/SavedProjects.zile")) {
+			BinaryFormatter bf = new BinaryFormatter();
+			FileStream fs = File.Open(Application.persistentDataPath + "/SavedProjects.zile", FileMode.Open);
+			projects = (List<Project>)bf.Deserialize(fs);
+			fs.Close();
+		}
+	}
+
 	float RoundToDecimal(float value, int dec){
 		float pow = Mathf.Pow(10f, dec);
 		value *= pow;
@@ -170,9 +184,9 @@ public class ZilaGUI : MonoBehaviour {
 	}
 
 	void UpdateActiveMarker(){
-		if(projekt.trakt1.zile.Contains(activeMarker) ==false)
+		if(trenutni.trakt1.zile.Contains(activeMarker) ==false)
 			activeMarker = null;
-		foreach(Oznaka oznaka in projekt.trakt1.zile){
+		foreach(Oznaka oznaka in trenutni.trakt1.zile){
 			if(Event.current.keyCode != KeyCode.None && oznaka.kratica == Event.current.keyCode && Event.current.type == EventType.keyDown){
 				activeMarker = oznaka;
 				break;
@@ -184,7 +198,7 @@ public class ZilaGUI : MonoBehaviour {
 
 	#region GUI
 	void MarkerEditGUI(int markerIndex){
-		Oznaka oznaka = projekt.trakt1.zile[markerIndex];
+		Oznaka oznaka = trenutni.trakt1.zile[markerIndex];
 
 		Color temp = GUI.color;
 		GUI.color = oznaka.boja;
@@ -221,8 +235,8 @@ public class ZilaGUI : MonoBehaviour {
 		GUILayout.Label("set key to");
 		if(GUILayout.Button("delete")){
 			if(oznaka.kratica == KeyCode.Delete){
-				projekt.trakt1.zile.RemoveAt(markerIndex);
-				projekt.trakt2.zile.RemoveAt(markerIndex);
+				trenutni.trakt1.zile.RemoveAt(markerIndex);
+				trenutni.trakt2.zile.RemoveAt(markerIndex);
 				markerToEdit = -1;
 			}
 		}
@@ -365,7 +379,8 @@ public class Oznaka{
 	public Oznaka(){}
 }
 
-public class Project : ScriptableObject{
+[System.Serializable]
+public class Project{
 	public GiTrakt trakt1 = new GiTrakt();
 	public GiTrakt trakt2 = new GiTrakt();
 
