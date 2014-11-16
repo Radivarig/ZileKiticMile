@@ -11,6 +11,9 @@ public class ZilaGUI : MonoBehaviour {
 
 	public Texture2D bgTex;
 	public Texture2D workingPicture;
+	public Texture2D dot;
+
+	public bool crtajTrakt1 = true;
 
 	public int markerToEdit = -1;
 	public Oznaka activeMarker;
@@ -68,13 +71,15 @@ public class ZilaGUI : MonoBehaviour {
 		{
 			GUILayout.BeginArea(slike);
 			GUILayout.BeginHorizontal();
-			if (GUILayout.Button(" ")){}
+			if (GUILayout.Button("otvori sliku")){}
 			if (GUILayout.Button("otvori sliku")){}
 			if(Event.current.type == EventType.mouseDown && Event.current.button == 0){
 				if(activeMarker !=null){
-
+					activeMarker.pojave.Add(Event.current.mousePosition);
 				}
 			}
+			if(crtajTrakt1) NacrtajPojave(trakt1.zile);
+			else NacrtajPojave(trakt2.zile);
 			GUILayout.EndHorizontal();
 			GUILayout.EndArea();
 		}
@@ -114,9 +119,21 @@ public class ZilaGUI : MonoBehaviour {
 		return omjeri;
 	}
 
+	void NacrtajPojave(List<Oznaka> oznake){
+		foreach(Oznaka oznaka in oznake){
+			Color temp = GUI.color;
+			GUI.color = oznaka.boja;
+			foreach(Vector2 pojava in oznaka.pojave){
+				Rect rect = new Rect(pojava.x -oznaka.scale/2f, pojava.y -oznaka.scale/2f, oznaka.scale, oznaka.scale);
+				GUI.DrawTexture(rect, dot);
+			}
+			GUI.color = temp;
+		}
+	}
+
 	void UpdateActiveMarker(){
 		if(trakt1.zile.Contains(activeMarker) ==false)
-			activeMarker = trakt1.zile[trakt1.zile.Count -1];
+			activeMarker = null;
 		foreach(Oznaka oznaka in trakt1.zile){
 			if(Event.current.keyCode != KeyCode.None && oznaka.kratica == Event.current.keyCode && Event.current.type == EventType.keyDown){
 				activeMarker = oznaka;
@@ -298,6 +315,7 @@ public class Oznaka{
 	public bool kraticaListen = false;	//TODO make global temp <string,bool> dictionary instead
 	public KeyCode kratica = KeyCode.None;
 	public Color boja = Color.green;
+	public float scale = 5f;		//pixels
 	public List<Vector2> pojave = new List<Vector2>();
 
 	public float texToImageRatio = 0.01f;
