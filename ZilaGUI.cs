@@ -12,6 +12,11 @@ public class ZilaGUI : MonoBehaviour {
 	public Texture2D workingPicture;
 	
 	void Update(){
+		if(trakt1.zile.Count == 0){
+			trakt1.zile.Add(new Oznaka());
+			trakt2.zile.Add(new Oznaka());
+		}
+
 		omjeri = Omjeri(trakt1, trakt2);
 	}
 
@@ -24,16 +29,20 @@ public class ZilaGUI : MonoBehaviour {
 		okvir.position = (_scr -velicinaOkvira)/2f;
 		okvir.y -= okvir.height/2f;
 
-
 		Rect lijevi = okvir; 	lijevi.width *= 0.45f;
 		Rect srednji = lijevi;	srednji.width = okvir.width*0.1f;	srednji.x += lijevi.width;
 		Rect desni = lijevi;	desni.position = new Vector2 (desni.position.x +desni.width + okvir.width*0.1f, desni.position.y);
 		Rect slike = okvir;		slike.y += slike.height;
+		Rect oznake = srednji;	oznake.x = okvir.x -oznake.width -1;
 
 		GUI.Box(okvir, "");
 		{
 			GUILayout.BeginArea(lijevi);
+			GUILayout.BeginHorizontal();
+			GUILayout.FlexibleSpace();
 			GUILayout.Label("BPC157");
+			GUILayout.FlexibleSpace();
+			GUILayout.EndHorizontal();
 			ZileGUI(trakt1);
 			GUILayout.EndArea();
 			
@@ -42,11 +51,14 @@ public class ZilaGUI : MonoBehaviour {
 			GUILayout.EndArea();
 			
 			GUILayout.BeginArea(desni);
+			GUILayout.BeginHorizontal();
+			GUILayout.FlexibleSpace();
 			GUILayout.Label("Kontrola");
+			GUILayout.FlexibleSpace();
+			GUILayout.EndHorizontal();
 			ZileGUI(trakt2);
 			GUILayout.EndArea();
 		}
-
 		GUI.Box(slike, "");
 		{
 			GUILayout.BeginArea(slike);
@@ -55,22 +67,17 @@ public class ZilaGUI : MonoBehaviour {
 			}
 			GUILayout.EndArea();
 		}
+		GUI.Box(oznake, "");
+		{
+			GUILayout.BeginArea(oznake);
+			OznakeGUI(trakt1, trakt2);
+			GUILayout.EndArea();
+		}
 	}
 
 	#region funkcije
 	 
 	#region non-GUI
-	void DodajPraznuNaKrajAkoNemaPrazne(List<Oznaka> oznake){
-		bool dodaj = true;
-		foreach (Oznaka oznaka in oznake){
-			if(oznaka.pojave.Count == 0) {
-				dodaj = false;
-				break;
-			}
-		}
-		if(dodaj) oznake.Add(new Oznaka());
-	}
-
 	float RoundToDecimal(float value, int dec){
 		float pow = Mathf.Pow(10f, dec);
 		value *= pow;
@@ -96,6 +103,38 @@ public class ZilaGUI : MonoBehaviour {
 	#endregion
 
 	#region GUI
+	void OznakeGUI(GiTrakt trakt1, GiTrakt trakt2){
+		GUILayout.BeginVertical();
+		GUILayout.Label("");	//tip
+		GUILayout.Label("");	//ime
+		GUILayout.Label("");	//zbroj
+		GUILayout.Label("");	//prosjek
+		for(int i = 0; i < trakt1.zile.Count; ++i){
+			GUILayout.BeginHorizontal();
+			Color temp = GUI.color;
+			GUI.color = trakt1.zile[i].boja;
+			if(GUILayout.Button("" + (trakt1.zile[i].kraticaListen ? "press" : trakt1.zile[i].kratica.ToString()))){
+				trakt1.zile[i].kraticaListen = true;
+			}
+			if(trakt1.zile[i].kraticaListen){
+				if(Event.current.type == EventType.keyDown){
+					trakt1.zile[i].kraticaListen = false;
+					if(Event.current.keyCode != KeyCode.Escape){
+						trakt1.zile[i].kratica = Event.current.keyCode;
+						trakt2.zile[i].kratica = Event.current.keyCode;
+					}
+				}
+			}
+			GUI.color = temp;
+			GUILayout.EndHorizontal();
+		}
+		if(GUILayout.Button("novi")){
+			trakt1.zile.Add(new Oznaka());
+			trakt2.zile.Add(new Oznaka());
+		}
+		GUILayout.EndVertical();
+	}
+
 	void OmjerGUI(List<float> omjeri){
 		GUILayout.BeginVertical();
 		GUILayout.Label("");	//tip
@@ -122,9 +161,7 @@ public class ZilaGUI : MonoBehaviour {
 		}
 	}
 
-	void ZileGUI(GiTrakt trakt){
-		DodajPraznuNaKrajAkoNemaPrazne(trakt.zile);
-		
+	void ZileGUI(GiTrakt trakt){		
 		GUILayout.BeginVertical();
 		{
 			int suma = trakt.Zbroj();
@@ -152,17 +189,8 @@ public class ZilaGUI : MonoBehaviour {
 				int brojPojava = trakt.zile[i].pojave.Count;
 
 				GUILayout.BeginHorizontal();
-
-				if(GUILayout.Button("" + (trakt.zile[i].kraticaListen ? "press" : trakt.zile[i].kratica.ToString()))){
-					trakt.zile[i].kraticaListen = true;
-				}
-				if(trakt.zile[i].kraticaListen){
-					if(Event.current.type == EventType.keyDown){
-						trakt.zile[i].kratica = Event.current.keyCode;
-						trakt.zile[i].kraticaListen = false;
-					}
-				}
-				GUILayout.Label("" +brojPojava +"/" + trakt.sa +" = " +(float)brojPojava/trakt.sa);
+				GUILayout.Box("" +brojPojava);
+				GUILayout.Label("/" + trakt.sa +" = " +(float)brojPojava/trakt.sa);
 				GUILayout.EndHorizontal();
 			}
 		}
