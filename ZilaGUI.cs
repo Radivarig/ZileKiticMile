@@ -128,10 +128,9 @@ public class ZilaGUI : MonoBehaviour {
 		GUILayout.BeginVertical();
 		{
 			int suma = trakt.Zbroj();
-			float prosjek = trakt.KvocijentZbrojaZilaSa();
-			
-			Event e = Event.current;
-			if (e.type == EventType.keyDown && e.keyCode == KeyCode.Return){
+			//float prosjek = trakt.KvocijentZbrojaZilaSa();
+	
+			if (Event.current.type == EventType.keyDown && Event.current.keyCode == KeyCode.Return){
 				trakt.uPreimenovanju = false;
 			}
 			if(trakt.uPreimenovanju) trakt.ime = GUILayout.TextField(trakt.ime);
@@ -153,10 +152,17 @@ public class ZilaGUI : MonoBehaviour {
 				int brojPojava = trakt.zile[i].pojave.Count;
 
 				GUILayout.BeginHorizontal();
-		
-				string brojPojavaString = "";
-				if(brojPojava != 0) brojPojavaString = brojPojava.ToString();
-				GUILayout.Label("" +brojPojavaString +"/" + trakt.sa +" = " +(float)brojPojava/trakt.sa);
+
+				if(GUILayout.Button("" + (trakt.zile[i].kraticaListen ? "press" : trakt.zile[i].kratica.ToString()))){
+					trakt.zile[i].kraticaListen = true;
+				}
+				if(trakt.zile[i].kraticaListen){
+					if(Event.current.type == EventType.keyDown){
+						trakt.zile[i].kratica = Event.current.keyCode;
+						trakt.zile[i].kraticaListen = false;
+					}
+				}
+				GUILayout.Label("" +brojPojava +"/" + trakt.sa +" = " +(float)brojPojava/trakt.sa);
 				GUILayout.EndHorizontal();
 			}
 		}
@@ -168,7 +174,7 @@ public class ZilaGUI : MonoBehaviour {
 }
 public class GiTrakt{
 	public string ime = "neimenovani trakt";
-	public bool uPreimenovanju = false;
+	public bool uPreimenovanju = false;		//TODO make global temp <string,bool> dictionary instead
 	public List<Oznaka> zile = new List<Oznaka>();
 	public int sa = 1;
 
@@ -196,6 +202,7 @@ public class GiTrakt{
 
 public class Oznaka{
 	public string ime = "neimenovana oznaka";
+	public bool kraticaListen = false;	//TODO make global temp <string,bool> dictionary instead
 	public KeyCode kratica = KeyCode.None;
 	public Color boja = Color.green;
 	public List<Vector2> pojave = new List<Vector2>();
