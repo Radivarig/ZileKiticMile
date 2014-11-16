@@ -128,10 +128,11 @@ public class ZilaGUI : MonoBehaviour {
 				string zilaToString = "";
 				if(trakt.zile[i] != 0) zilaToString = trakt.zile[i].ToString();
 				zilaToString = GUILayout.TextField(zilaToString);
+
 				int zilaInt = 0;
-				if(int.TryParse(zilaToString, out zilaInt))
-					trakt.zile[i] = zilaInt;
-				
+				int.TryParse(zilaToString, out zilaInt);
+				trakt.zile[i] = zilaInt;
+
 				GUILayout.Label(""+trakt.zile[i] +"/" + trakt.sa +" = " +(float)trakt.zile[i]/trakt.sa);
 				GUILayout.EndHorizontal();
 			}
