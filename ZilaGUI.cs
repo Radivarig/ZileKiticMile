@@ -9,8 +9,7 @@ public class ZilaGUI : MonoBehaviour {
 	List<float> omjeri = new List<float>();
 	public Vector2 velicinaOkvira = new Vector2(500f, 300f);
 	public Texture2D bgTex;
-
-
+	
 	void Update(){
 		omjeri = Omjeri(trakt1, trakt2);
 	}
@@ -25,15 +24,9 @@ public class ZilaGUI : MonoBehaviour {
 
 		GUI.Box(okvir, "");
 
-		Rect lijevi = okvir;
-		lijevi.width *= 0.45f;
-
-		Rect srednji = lijevi;
-		srednji.width = okvir.width*0.1f;
-		srednji.x += lijevi.width;
-
-		Rect desni = lijevi;
-		desni.position = new Vector2 (desni.position.x +desni.width + okvir.width*0.1f, desni.position.y);
+		Rect lijevi = okvir; 	lijevi.width *= 0.45f;
+		Rect srednji = lijevi;	srednji.width = okvir.width*0.1f;	srednji.x += lijevi.width;
+		Rect desni = lijevi;	desni.position = new Vector2 (desni.position.x +desni.width + okvir.width*0.1f, desni.position.y);
 
 		GUILayout.BeginArea(lijevi);
 		GUILayout.Label("BPC157");
@@ -48,9 +41,14 @@ public class ZilaGUI : MonoBehaviour {
 		GUILayout.Label("Kontrola");
 		ZileGUI(trakt2);
 		GUILayout.EndArea();
+
+
+		GUILayout.BeginArea();
+		GUILayout.EndArea();
 	}
 
 	#region funkcije
+	 
 	#region non-GUI
 	void DodajPraznuNaKrajAkoNemaPrazne(List<int> lista){
 		bool dodaj = true;
@@ -87,7 +85,7 @@ public class ZilaGUI : MonoBehaviour {
 	}
 	#endregion
 
-	#region GUI funkcije
+	#region GUI
 	void OmjerGUI(List<float> omjeri){
 		GUILayout.BeginVertical();
 		GUILayout.Label("");	//tip
