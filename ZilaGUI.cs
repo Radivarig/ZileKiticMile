@@ -8,6 +8,7 @@ public class ZilaGUI : MonoBehaviour {
 	GiTrakt trakt2 = new GiTrakt();
 	List<float> omjeri = new List<float>();
 	public Vector2 velicinaOkvira = new Vector2(500f, 300f);
+	public Texture2D bgTex;
 
 
 	void Update(){
@@ -19,6 +20,14 @@ public class ZilaGUI : MonoBehaviour {
 		okvir.size = velicinaOkvira;
 		Vector2 _scr = new Vector2(Screen.width, Screen.height);
 		okvir.position = (_scr -velicinaOkvira)/2f;
+
+		if(bgTex)
+		{
+			bgTex.wrapMode = TextureWrapMode.Repeat;
+			Rect screenBounds = new Rect(0,0, _scr.x, _scr.y);
+			GUI.DrawTextureWithTexCoords(screenBounds, bgTex, new Rect(0, 0, screenBounds.width / bgTex.width, screenBounds.height / bgTex.height));
+		}
+		GUI.Box(okvir, "");
 
 		Rect lijevi = okvir;
 		lijevi.width *= 0.45f;
