@@ -16,17 +16,13 @@ public class ZilaGUI : MonoBehaviour {
 	}
 
 	void OnGUI(){
+		BackgroundGUI();
+
 		Rect okvir = new Rect();
 		okvir.size = velicinaOkvira;
 		Vector2 _scr = new Vector2(Screen.width, Screen.height);
 		okvir.position = (_scr -velicinaOkvira)/2f;
 
-		if(bgTex)
-		{
-			bgTex.wrapMode = TextureWrapMode.Repeat;
-			Rect screenBounds = new Rect(0,0, _scr.x, _scr.y);
-			GUI.DrawTextureWithTexCoords(screenBounds, bgTex, new Rect(0, 0, screenBounds.width / bgTex.width, screenBounds.height / bgTex.height));
-		}
 		GUI.Box(okvir, "");
 
 		Rect lijevi = okvir;
@@ -55,6 +51,7 @@ public class ZilaGUI : MonoBehaviour {
 	}
 
 	#region funkcije
+	#region non-GUI
 	void DodajPraznuNaKrajAkoNemaPrazne(List<int> lista){
 		bool dodaj = true;
 		foreach (int clan in lista){
@@ -73,6 +70,24 @@ public class ZilaGUI : MonoBehaviour {
 		return value/pow;
 	}
 
+	List<float> Omjeri(GiTrakt trakt1, GiTrakt trakt2){
+		List<float> omjeri = new List<float>();
+		int minCount = 0;
+		if(trakt2.zile.Count > trakt1.zile.Count) minCount = trakt1.zile.Count;
+		else minCount = trakt2.zile.Count;
+		
+		for(int i = 0; i < minCount; ++i){
+			float t1 = trakt1.KvocijentPojedineSa(i);
+			float t2 = trakt2.KvocijentPojedineSa(i);
+			
+			if(t1 != 0 && t2 != 0) omjeri.Add(t1/t2);
+			else omjeri.Add(0);
+		}
+		return omjeri;
+	}
+	#endregion
+
+	#region GUI funkcije
 	void OmjerGUI(List<float> omjeri){
 		GUILayout.BeginVertical();
 		GUILayout.Label("");	//tip
@@ -89,21 +104,14 @@ public class ZilaGUI : MonoBehaviour {
 		}
 		GUILayout.EndVertical();
 	}
-	
-	List<float> Omjeri(GiTrakt trakt1, GiTrakt trakt2){
-		List<float> omjeri = new List<float>();
-		int minCount = 0;
-		if(trakt2.zile.Count > trakt1.zile.Count) minCount = trakt1.zile.Count;
-		else minCount = trakt2.zile.Count;
-		
-		for(int i = 0; i < minCount; ++i){
-			float t1 = trakt1.KvocijentPojedineSa(i);
-			float t2 = trakt2.KvocijentPojedineSa(i);
 
-			if(t1 != 0 && t2 != 0) omjeri.Add(t1/t2);
-			else omjeri.Add(0);
+	void BackgroundGUI(){
+		if(bgTex)
+		{
+			bgTex.wrapMode = TextureWrapMode.Repeat;
+			Rect screenBounds = new Rect(0,0, Screen.width, Screen.height);
+			GUI.DrawTextureWithTexCoords(screenBounds, bgTex, new Rect(0, 0, screenBounds.width / bgTex.width, screenBounds.height / bgTex.height));
 		}
-		return omjeri;
 	}
 
 	void ZileGUI(GiTrakt trakt){
@@ -152,6 +160,8 @@ public class ZilaGUI : MonoBehaviour {
 		GUILayout.EndVertical();
 	}
 	#endregion
+	#endregion
+	
 }
 public class GiTrakt{
 	public string ime = "neimenovani trakt";
