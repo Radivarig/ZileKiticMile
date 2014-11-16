@@ -14,6 +14,8 @@ public class ZilaGUI : MonoBehaviour {
 	public Texture2D dot;
 
 	public bool crtajTrakt1 = true;
+	public float eraseSize = 10f;
+	
 
 	public int markerToEdit = -1;
 	public Oznaka activeMarker;
@@ -71,13 +73,28 @@ public class ZilaGUI : MonoBehaviour {
 		{
 			GUILayout.BeginArea(slike);
 			GUILayout.BeginHorizontal();
-			if (GUILayout.Button("otvori sliku")){}
-			if (GUILayout.Button("otvori sliku")){}
+			if (GUILayout.Button("otvori sliku -BPC157")){}
+			if (GUILayout.Button("otvori sliku -Kontrola")){}
 			if(Event.current.type == EventType.mouseDown && Event.current.button == 0){
 				if(activeMarker !=null){
 					activeMarker.pojave.Add(Event.current.mousePosition);
 				}
 			}
+
+			if(Event.current.isMouse && Event.current.button == 1){
+				Rect aroundMouse = new Rect(Event.current.mousePosition.x, Event.current.mousePosition.y, eraseSize, eraseSize);
+				GiTrakt trakt = trakt2;
+				if(crtajTrakt1) trakt = trakt1;
+				foreach(Oznaka oznaka in trakt.zile){
+					for(int i = 0; i < oznaka.pojave.Count; ++i){
+						Vector2 pojava = oznaka.pojave[i];
+						if(aroundMouse.Contains(pojava)){
+							oznaka.pojave.RemoveAt(i--);
+						}
+					}
+				}
+			}
+
 			if(crtajTrakt1) NacrtajPojave(trakt1.zile);
 			else NacrtajPojave(trakt2.zile);
 			GUILayout.EndHorizontal();
@@ -215,8 +232,7 @@ public class ZilaGUI : MonoBehaviour {
 		}
 		GUILayout.EndVertical();
 	}
-
-
+	
 	void OmjerGUI(List<float> omjeri){
 		GUILayout.BeginVertical();
 		GUILayout.Label("");	//tip
