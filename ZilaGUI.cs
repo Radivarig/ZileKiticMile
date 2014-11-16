@@ -77,6 +77,7 @@ public class ZilaGUI : MonoBehaviour {
 			if (GUILayout.Button("otvori sliku -Kontrola")){}
 			if(Event.current.type == EventType.mouseDown && Event.current.button == 0){
 				if(activeMarker !=null){
+					if(activeMarker.notHidden ==false) activeMarker.notHidden = true;
 					activeMarker.pojave.Add(Event.current.mousePosition);
 				}
 			}
@@ -88,7 +89,7 @@ public class ZilaGUI : MonoBehaviour {
 				foreach(Oznaka oznaka in trakt.zile){
 					for(int i = 0; i < oznaka.pojave.Count; ++i){
 						Vector2 pojava = oznaka.pojave[i];
-						if(aroundMouse.Contains(pojava)){
+						if(aroundMouse.Contains(pojava) && oznaka.notHidden ==true){
 							oznaka.pojave.RemoveAt(i--);
 						}
 					}
@@ -138,6 +139,7 @@ public class ZilaGUI : MonoBehaviour {
 
 	void NacrtajPojave(List<Oznaka> oznake){
 		foreach(Oznaka oznaka in oznake){
+			if(oznaka.notHidden ==false) continue;
 			Color temp = GUI.color;
 			GUI.color = oznaka.boja;
 			foreach(Vector2 pojava in oznaka.pojave){
@@ -287,6 +289,7 @@ public class ZilaGUI : MonoBehaviour {
 				int brojPojava = trakt.zile[i].pojave.Count;
 
 				GUILayout.BeginHorizontal();
+				trakt.zile[i].notHidden = GUILayout.Toggle(trakt.zile[i].notHidden, "", GUILayout.Width(30));
 				GUILayout.Box("" +brojPojava);
 				GUILayout.Label("/" + trakt.sa +" = " +(float)brojPojava/trakt.sa);
 				GUILayout.EndHorizontal();
@@ -331,6 +334,7 @@ public class Oznaka{
 	public bool kraticaListen = false;	//TODO make global temp <string,bool> dictionary instead
 	public KeyCode kratica = KeyCode.None;
 	public Color boja = Color.green;
+	public bool notHidden = true;
 	public float scale = 10f;		//pixels
 	public List<Vector2> pojave = new List<Vector2>();
 
