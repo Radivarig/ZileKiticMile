@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
+using System.Text.RegularExpressions;
 
 public class ZilaGUI : MonoBehaviour {
 	GiTrakt trakt1 = new GiTrakt();
@@ -128,6 +129,8 @@ public class ZilaGUI : MonoBehaviour {
 				string zilaToString = "";
 				if(trakt.zile[i] != 0) zilaToString = trakt.zile[i].ToString();
 				zilaToString = GUILayout.TextField(zilaToString);
+
+				zilaToString = Regex.Replace(zilaToString, @"[^0-9]", "");
 
 				int zilaInt = 0;
 				int.TryParse(zilaToString, out zilaInt);
