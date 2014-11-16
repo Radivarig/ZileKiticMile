@@ -147,13 +147,13 @@ public class ZilaGUI : MonoBehaviour {
 		}
 		GUILayout.Space(10);
 		GUI.color = oznaka.boja;
-		GUILayout.Label("to delete,set");
-		GUILayout.Label("key [delete]");
+		GUILayout.Label("to delete,");
+		GUILayout.Label("set key to");
 		if(GUILayout.Button("delete")){
 			if(oznaka.kratica == KeyCode.Delete){
 				trakt1.zile.RemoveAt(markerIndex);
 				trakt2.zile.RemoveAt(markerIndex);
-				markerIndex = -1;
+				markerToEdit = -1;
 			}
 		}
 		GUI.color = temp;
