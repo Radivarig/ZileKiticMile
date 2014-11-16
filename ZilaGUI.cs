@@ -70,8 +70,12 @@ public class ZilaGUI : MonoBehaviour {
 		GUILayout.Label("");	//zbroj
 		GUILayout.Label("");	//prosjek
 		foreach(float o in omjeri){
+			GUILayout.BeginHorizontal();
+			GUILayout.FlexibleSpace();
 			if(o != 0) GUILayout.Label("" +RoundToDecimal(o, 5));
 			else GUILayout.Label("null");
+			GUILayout.FlexibleSpace();
+			GUILayout.EndHorizontal();
 		}
 		GUILayout.EndVertical();
 	}
