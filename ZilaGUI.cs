@@ -171,8 +171,9 @@ public class ZilaGUI : MonoBehaviour {
 		GUILayout.BeginVertical();
 		GUILayout.Label("");	//tip
 		GUILayout.Label("");	//ime
-		GUILayout.Label("");	//zbroj	
-		GUILayout.Label("");	//prosjek
+		GUILayout.Label("promjer: ");
+		oznaka.scale = GUILayout.HorizontalSlider(oznaka.scale, 2f, 15f);
+		GUILayout.Label("boja, r-g-b: ");
 		oznaka.boja.r = GUILayout.HorizontalSlider(oznaka.boja.r, 0f, 1f);
 		oznaka.boja.g = GUILayout.HorizontalSlider(oznaka.boja.g, 0f, 1f);
 		oznaka.boja.b = GUILayout.HorizontalSlider(oznaka.boja.b, 0f, 1f);
@@ -214,7 +215,6 @@ public class ZilaGUI : MonoBehaviour {
 		GUILayout.Label("");	//ime
 		GUILayout.Label("");	//zbroj
 		GUILayout.Label("");	//prosjek
-
 		for(int i = 0; i < trakt1.zile.Count; ++i){
 			GUILayout.BeginHorizontal();
 			Color temp = GUI.color;
@@ -331,7 +331,7 @@ public class Oznaka{
 	public bool kraticaListen = false;	//TODO make global temp <string,bool> dictionary instead
 	public KeyCode kratica = KeyCode.None;
 	public Color boja = Color.green;
-	public float scale = 5f;		//pixels
+	public float scale = 10f;		//pixels
 	public List<Vector2> pojave = new List<Vector2>();
 
 	public float texToImageRatio = 0.01f;
