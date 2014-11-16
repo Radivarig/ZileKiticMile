@@ -8,9 +8,12 @@ public class ZilaGUI : MonoBehaviour {
 	GiTrakt trakt2 = new GiTrakt();
 	List<float> omjeri = new List<float>();
 	public Vector2 velicinaOkvira = new Vector2(500f, 250f);
+
 	public Texture2D bgTex;
 	public Texture2D workingPicture;
-	
+
+	public int markerToEdit = -1;
+
 	void Update(){
 		if(trakt1.zile.Count == 0){
 			trakt1.zile.Add(new Oznaka());
@@ -33,7 +36,7 @@ public class ZilaGUI : MonoBehaviour {
 		Rect srednji = lijevi;	srednji.width = okvir.width*0.1f;	srednji.x += lijevi.width;
 		Rect desni = lijevi;	desni.position = new Vector2 (desni.position.x +desni.width + okvir.width*0.1f, desni.position.y);
 		Rect slike = okvir;		slike.y += slike.height;
-		Rect oznake = srednji;	oznake.x = okvir.x -oznake.width -1;
+		Rect oznake = srednji;	oznake.width *= 1.5f; oznake.x = okvir.x -oznake.width -1;
 
 		GUI.Box(okvir, "");
 		{
@@ -62,15 +65,23 @@ public class ZilaGUI : MonoBehaviour {
 		GUI.Box(slike, "");
 		{
 			GUILayout.BeginArea(slike);
+			GUILayout.BeginHorizontal();
 			if (GUILayout.Button("otvori sliku")){
 
 			}
+			if (GUILayout.Button("otvori sliku")){
+				
+			}
+
+			GUILayout.EndHorizontal();
 			GUILayout.EndArea();
 		}
+
 		GUI.Box(oznake, "");
 		{
 			GUILayout.BeginArea(oznake);
-			OznakeGUI(trakt1, trakt2);
+			if(markerToEdit > -1) MarkerEditGUI(markerToEdit);
+			else OznakeGUI(trakt1, trakt2);
 			GUILayout.EndArea();
 		}
 	}
@@ -103,27 +114,66 @@ public class ZilaGUI : MonoBehaviour {
 	#endregion
 
 	#region GUI
+	void MarkerEditGUI(int markerIndex){
+		Oznaka oznaka = trakt1.zile[markerIndex];
+
+		Color temp = GUI.color;
+		GUI.color = oznaka.boja;
+
+		GUILayout.BeginVertical();
+		GUILayout.Label("");	//tip
+		GUILayout.Label("");	//ime
+		GUILayout.Label("");	//zbroj	
+		GUILayout.Label("");	//prosjek
+		oznaka.boja.r = GUILayout.HorizontalSlider(oznaka.boja.r, 0f, 1f);
+		oznaka.boja.g = GUILayout.HorizontalSlider(oznaka.boja.g, 0f, 1f);
+		oznaka.boja.b = GUILayout.HorizontalSlider(oznaka.boja.b, 0f, 1f);
+		if(GUILayout.Button("" + (oznaka.kraticaListen ? "press key" : "key: "+oznaka.kratica.ToString()))){
+			oznaka.kraticaListen = true;
+		}
+		if(oznaka.kraticaListen){
+			if(Event.current.type == EventType.keyDown){
+				oznaka.kraticaListen = false;
+				if(Event.current.keyCode != KeyCode.Escape){
+					oznaka.kratica = Event.current.keyCode;
+				}
+			}
+		}
+		GUI.color = temp;
+		
+		GUILayout.Space(10);
+		if(GUILayout.Button("ok")){
+			markerToEdit = -1;
+		}
+		GUILayout.Space(10);
+		GUI.color = oznaka.boja;
+		GUILayout.Label("to delete,set");
+		GUILayout.Label("key [delete]");
+		if(GUILayout.Button("delete")){
+			if(oznaka.kratica == KeyCode.Delete){
+				trakt1.zile.RemoveAt(markerIndex);
+				trakt2.zile.RemoveAt(markerIndex);
+				markerIndex = -1;
+			}
+		}
+		GUI.color = temp;
+		GUILayout.EndVertical();
+	}
+
 	void OznakeGUI(GiTrakt trakt1, GiTrakt trakt2){
 		GUILayout.BeginVertical();
 		GUILayout.Label("");	//tip
 		GUILayout.Label("");	//ime
 		GUILayout.Label("");	//zbroj
 		GUILayout.Label("");	//prosjek
+
 		for(int i = 0; i < trakt1.zile.Count; ++i){
 			GUILayout.BeginHorizontal();
 			Color temp = GUI.color;
 			GUI.color = trakt1.zile[i].boja;
-			if(GUILayout.Button("" + (trakt1.zile[i].kraticaListen ? "press" : trakt1.zile[i].kratica.ToString()))){
-				trakt1.zile[i].kraticaListen = true;
-			}
-			if(trakt1.zile[i].kraticaListen){
-				if(Event.current.type == EventType.keyDown){
-					trakt1.zile[i].kraticaListen = false;
-					if(Event.current.keyCode != KeyCode.Escape){
-						trakt1.zile[i].kratica = Event.current.keyCode;
-						trakt2.zile[i].kratica = Event.current.keyCode;
-					}
-				}
+			
+			if(GUILayout.Button("" + trakt1.zile[i].kratica.ToString())){
+				markerToEdit = i;
 			}
 			GUI.color = temp;
 			GUILayout.EndHorizontal();
@@ -134,6 +184,7 @@ public class ZilaGUI : MonoBehaviour {
 		}
 		GUILayout.EndVertical();
 	}
+
 
 	void OmjerGUI(List<float> omjeri){
 		GUILayout.BeginVertical();
