@@ -9,6 +9,7 @@ public class ZilaGUI : MonoBehaviour {
 	List<float> omjeri = new List<float>();
 	public Vector2 velicinaOkvira = new Vector2(500f, 250f);
 	public Texture2D bgTex;
+	public Texture2D workingPicture;
 	
 	void Update(){
 		omjeri = Omjeri(trakt1, trakt2);
@@ -49,6 +50,9 @@ public class ZilaGUI : MonoBehaviour {
 		GUI.Box(slike, "");
 		{
 			GUILayout.BeginArea(slike);
+			if (GUILayout.Button("otvori sliku")){
+
+			}
 			GUILayout.EndArea();
 		}
 	}
@@ -193,4 +197,16 @@ public class GiTrakt{
 		}
 		return (float)rez/sa;
 	}
+}
+
+public class Oznaka{
+	public string ime = "neimenovana oznaka";
+	public KeyCode kratica = KeyCode.None;
+	public Color boja = Color.green;
+	public List<Vector2> pojave = new List<Vector2>();
+
+	public float texToImageRatio = 0.01f;
+	public Texture2D tex = null;
+
+	public Oznaka(){}
 }
