@@ -13,6 +13,7 @@ public class ZilaGUI : MonoBehaviour {
 	public Texture2D workingPicture;
 
 	public int markerToEdit = -1;
+	public int activeMarkerIndex = -1;
 
 	void Update(){
 		if(trakt1.zile.Count == 0){
@@ -24,6 +25,7 @@ public class ZilaGUI : MonoBehaviour {
 	}
 
 	void OnGUI(){
+		UpdateActiveMarker();
 		BackgroundGUI();
 
 		Rect okvir = new Rect();
@@ -66,13 +68,13 @@ public class ZilaGUI : MonoBehaviour {
 		{
 			GUILayout.BeginArea(slike);
 			GUILayout.BeginHorizontal();
-			if (GUILayout.Button("otvori sliku")){
+			if (GUILayout.Button(" "+activeMarkerIndex)){}
+			if (GUILayout.Button("otvori sliku")){}
+			if(Event.current.type == EventType.mouseDown && Event.current.button == 0){
+
+
 
 			}
-			if (GUILayout.Button("otvori sliku")){
-				
-			}
-
 			GUILayout.EndHorizontal();
 			GUILayout.EndArea();
 		}
@@ -111,6 +113,16 @@ public class ZilaGUI : MonoBehaviour {
 		}
 		return omjeri;
 	}
+
+	void UpdateActiveMarker(){
+		for(int i = 0; i < trakt1.zile.Count; ++i){
+			if(Event.current.keyCode != KeyCode.None && trakt1.zile[i].kratica == Event.current.keyCode && Event.current.type == EventType.keyDown){
+				activeMarkerIndex = i;
+				break;
+			}
+		}
+	}
+	
 	#endregion
 
 	#region GUI
@@ -172,7 +184,7 @@ public class ZilaGUI : MonoBehaviour {
 			Color temp = GUI.color;
 			GUI.color = trakt1.zile[i].boja;
 			
-			if(GUILayout.Button("" + trakt1.zile[i].kratica.ToString())){
+			if(GUILayout.Button("" +(activeMarkerIndex == i ? "[*] ": "") + trakt1.zile[i].kratica.ToString())){
 				markerToEdit = i;
 			}
 			GUI.color = temp;
