@@ -60,15 +60,15 @@ public class ZilaGUI : MonoBehaviour {
 	#region funkcije
 	 
 	#region non-GUI
-	void DodajPraznuNaKrajAkoNemaPrazne(List<int> lista){
+	void DodajPraznuNaKrajAkoNemaPrazne(List<Oznaka> oznake){
 		bool dodaj = true;
-		foreach (int clan in lista){
-			if(clan == 0) {
+		foreach (Oznaka oznaka in oznake){
+			if(oznaka.pojave.Count == 0) {
 				dodaj = false;
 				break;
 			}
 		}
-		if(dodaj) lista.Add(0);
+		if(dodaj) oznake.Add(new Oznaka());
 	}
 
 	float RoundToDecimal(float value, int dec){
@@ -150,18 +150,13 @@ public class ZilaGUI : MonoBehaviour {
 			GUILayout.EndHorizontal();
 			
 			for (int i = 0; i < trakt.zile.Count; ++i){
+				int brojPojava = trakt.zile[i].pojave.Count;
+
 				GUILayout.BeginHorizontal();
-				string zilaToString = "";
-				if(trakt.zile[i] != 0) zilaToString = trakt.zile[i].ToString();
-				zilaToString = GUILayout.TextField(zilaToString);
-
-				zilaToString = Regex.Replace(zilaToString, @"[^0-9]", "");
-
-				int zilaInt = 0;
-				int.TryParse(zilaToString, out zilaInt);
-				trakt.zile[i] = zilaInt;
-
-				GUILayout.Label(""+trakt.zile[i] +"/" + trakt.sa +" = " +(float)trakt.zile[i]/trakt.sa);
+		
+				string brojPojavaString = "";
+				if(brojPojava != 0) brojPojavaString = brojPojava.ToString();
+				GUILayout.Label("" +brojPojavaString +"/" + trakt.sa +" = " +(float)brojPojava/trakt.sa);
 				GUILayout.EndHorizontal();
 			}
 		}
@@ -174,26 +169,26 @@ public class ZilaGUI : MonoBehaviour {
 public class GiTrakt{
 	public string ime = "neimenovani trakt";
 	public bool uPreimenovanju = false;
-	public List<int> zile = new List<int>();
+	public List<Oznaka> zile = new List<Oznaka>();
 	public int sa = 1;
 
 	public GiTrakt(){}
 
 	public 	int Zbroj(){
 		int rez = 0;
-		foreach (int zila in zile){
-			rez += zila;
+		foreach (Oznaka zila in zile){
+			rez += zila.pojave.Count;
 		}
 		return rez;
 	}
 
 	public float KvocijentPojedineSa(int i){
-		return (float)zile[i]/sa;
+		return (float)zile[i].pojave.Count/sa;
 	}
-	public float KvocijentZbrojaZilaSa (){
+	public float KvocijentZbrojaZilaSa(){
 		float rez = 0;
-		foreach (int zila in zile){
-			rez += zila;
+		foreach (Oznaka zila in zile){
+			rez += zila.pojave.Count;
 		}
 		return (float)rez/sa;
 	}
