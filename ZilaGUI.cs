@@ -56,6 +56,13 @@ public class ZilaGUI : MonoBehaviour {
 		if(dodaj) lista.Add(0);
 	}
 
+	float RoundToDecimal(float value, int dec){
+		float pow = Mathf.Pow(10f, dec);
+		value *= pow;
+		value = Mathf.Round(value);
+		return value/pow;
+	}
+
 	void OmjerGUI(List<float> omjeri){
 		GUILayout.BeginVertical();
 		GUILayout.Label("");	//tip
@@ -63,7 +70,7 @@ public class ZilaGUI : MonoBehaviour {
 		GUILayout.Label("");	//zbroj
 		GUILayout.Label("");	//prosjek
 		foreach(float o in omjeri){
-			if(o != 0) GUILayout.Label("omjer: " +o);
+			if(o != 0) GUILayout.Label("" +RoundToDecimal(o, 5));
 			else GUILayout.Label("null");
 		}
 		GUILayout.EndVertical();
