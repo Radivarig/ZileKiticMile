@@ -13,7 +13,7 @@ public class ZilaGUI : MonoBehaviour {
 	public Texture2D workingPicture;
 
 	public int markerToEdit = -1;
-	public int activeMarkerIndex = -1;
+	public Oznaka activeMarker;
 
 	void Update(){
 		if(trakt1.zile.Count == 0){
@@ -68,12 +68,12 @@ public class ZilaGUI : MonoBehaviour {
 		{
 			GUILayout.BeginArea(slike);
 			GUILayout.BeginHorizontal();
-			if (GUILayout.Button(" "+activeMarkerIndex)){}
+			if (GUILayout.Button(" ")){}
 			if (GUILayout.Button("otvori sliku")){}
 			if(Event.current.type == EventType.mouseDown && Event.current.button == 0){
+				if(activeMarker !=null){
 
-
-
+				}
 			}
 			GUILayout.EndHorizontal();
 			GUILayout.EndArea();
@@ -115,9 +115,11 @@ public class ZilaGUI : MonoBehaviour {
 	}
 
 	void UpdateActiveMarker(){
-		for(int i = 0; i < trakt1.zile.Count; ++i){
-			if(Event.current.keyCode != KeyCode.None && trakt1.zile[i].kratica == Event.current.keyCode && Event.current.type == EventType.keyDown){
-				activeMarkerIndex = i;
+		if(trakt1.zile.Contains(activeMarker) ==false)
+			activeMarker = trakt1.zile[trakt1.zile.Count -1];
+		foreach(Oznaka oznaka in trakt1.zile){
+			if(Event.current.keyCode != KeyCode.None && oznaka.kratica == Event.current.keyCode && Event.current.type == EventType.keyDown){
+				activeMarker = oznaka;
 				break;
 			}
 		}
@@ -184,7 +186,7 @@ public class ZilaGUI : MonoBehaviour {
 			Color temp = GUI.color;
 			GUI.color = trakt1.zile[i].boja;
 			
-			if(GUILayout.Button("" +(activeMarkerIndex == i ? "[*] ": "") + trakt1.zile[i].kratica.ToString())){
+			if(GUILayout.Button("" +(activeMarker == trakt1.zile[i] ? "[*] ": "") + trakt1.zile[i].kratica.ToString())){
 				markerToEdit = i;
 			}
 			GUI.color = temp;
