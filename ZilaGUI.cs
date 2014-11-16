@@ -7,7 +7,7 @@ public class ZilaGUI : MonoBehaviour {
 	GiTrakt trakt1 = new GiTrakt();
 	GiTrakt trakt2 = new GiTrakt();
 	List<float> omjeri = new List<float>();
-	public Vector2 velicinaOkvira = new Vector2(500f, 300f);
+	public Vector2 velicinaOkvira = new Vector2(500f, 250f);
 	public Texture2D bgTex;
 	
 	void Update(){
@@ -21,30 +21,36 @@ public class ZilaGUI : MonoBehaviour {
 		okvir.size = velicinaOkvira;
 		Vector2 _scr = new Vector2(Screen.width, Screen.height);
 		okvir.position = (_scr -velicinaOkvira)/2f;
+		okvir.y -= okvir.height/2f;
 
-		GUI.Box(okvir, "");
 
 		Rect lijevi = okvir; 	lijevi.width *= 0.45f;
 		Rect srednji = lijevi;	srednji.width = okvir.width*0.1f;	srednji.x += lijevi.width;
 		Rect desni = lijevi;	desni.position = new Vector2 (desni.position.x +desni.width + okvir.width*0.1f, desni.position.y);
+		Rect slike = okvir;		slike.y += slike.height;
 
-		GUILayout.BeginArea(lijevi);
-		GUILayout.Label("BPC157");
-		ZileGUI(trakt1);
-		GUILayout.EndArea();
+		GUI.Box(okvir, "");
+		{
+			GUILayout.BeginArea(lijevi);
+			GUILayout.Label("BPC157");
+			ZileGUI(trakt1);
+			GUILayout.EndArea();
+			
+			GUILayout.BeginArea(srednji);
+			OmjerGUI(omjeri);
+			GUILayout.EndArea();
+			
+			GUILayout.BeginArea(desni);
+			GUILayout.Label("Kontrola");
+			ZileGUI(trakt2);
+			GUILayout.EndArea();
+		}
 
-		GUILayout.BeginArea(srednji);
-		OmjerGUI(omjeri);
-		GUILayout.EndArea();
-
-		GUILayout.BeginArea(desni);
-		GUILayout.Label("Kontrola");
-		ZileGUI(trakt2);
-		GUILayout.EndArea();
-
-
-		GUILayout.BeginArea();
-		GUILayout.EndArea();
+		GUI.Box(slike, "");
+		{
+			GUILayout.BeginArea(slike);
+			GUILayout.EndArea();
+		}
 	}
 
 	#region funkcije
