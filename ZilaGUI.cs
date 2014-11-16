@@ -3,9 +3,11 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
 
+[System.Serializable]
 public class ZilaGUI : MonoBehaviour {
-	GiTrakt trakt1 = new GiTrakt();
-	GiTrakt trakt2 = new GiTrakt();
+
+	public GiTrakt trakt1 = new GiTrakt();
+	public GiTrakt trakt2 = new GiTrakt();
 	List<float> omjeri = new List<float>();
 	public Vector2 velicinaOkvira = new Vector2(500f, 250f);
 
@@ -301,6 +303,7 @@ public class ZilaGUI : MonoBehaviour {
 	#endregion
 	
 }
+[System.Serializable]
 public class GiTrakt{
 	public string ime = "neimenovani trakt";
 	public bool uPreimenovanju = false;		//TODO make global temp <string,bool> dictionary instead
@@ -329,6 +332,7 @@ public class GiTrakt{
 	}
 }
 
+[System.Serializable]
 public class Oznaka{
 	public string ime = "neimenovana oznaka";
 	public bool kraticaListen = false;	//TODO make global temp <string,bool> dictionary instead
