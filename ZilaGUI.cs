@@ -162,13 +162,13 @@ public class ZilaGUI : MonoBehaviour {
 			if(pictureLeft && crtajTrakt1){
 				slike.width = pictureLeft.width;
 				slike.height = pictureLeft.height;
-				GUI.DrawTexture(new Rect(0f, 0f, pictureLeft.width, pictureLeft.height), pictureLeft);
+				GUI.DrawTexture(new Rect(0f +gridOffset1.x, 0f +gridOffset1.y, pictureLeft.width, pictureLeft.height), pictureLeft);
 			}
 			else{
 				if(pictureRight && crtajTrakt1 ==false){
 					slike.width = pictureRight.width;
 					slike.height = pictureRight.height;
-					GUI.DrawTexture(new Rect(0f, 0f, pictureRight.width, pictureRight.height), pictureRight);
+					GUI.DrawTexture(new Rect(0f +gridOffset2.x, 0f +gridOffset2.y, pictureRight.width, pictureRight.height), pictureRight);
 				}
 			}
 
