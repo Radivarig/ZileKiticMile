@@ -218,7 +218,7 @@ public class ZilaGUI : MonoBehaviour {
 						offset = gridOffset1;
 						zoom = zoom1;
 					}
-					activeMarker.pojave.Add(Event.current.mousePosition/zoom -offset);
+					activeMarker.pojave.Add(Event.current.mousePosition/zoom +offset);
 				}
 			}
 
