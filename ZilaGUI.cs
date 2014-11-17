@@ -5,10 +5,9 @@ using System.Text.RegularExpressions;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.IO;
 
-[System.Serializable]
 public class ZilaGUI : MonoBehaviour {
-	public List<Project> projects = new List<Project>();
-	public Project trenutni;
+	List<Project> projects = new List<Project>();
+	Project trenutni;
 
 	public string projectPath = "Assets/Saved";
 
@@ -21,16 +20,24 @@ public class ZilaGUI : MonoBehaviour {
 
 	public bool crtajTrakt1 = true;
 	public float eraseSize = 10f;
-	
 
 	public int markerToEdit = -1;
 	public Oznaka activeMarker;
 
+	void Awake(){
+		Load();
+	}
 	void Update(){
+		if (projects ==null)
+			Debug.Log("fuckgg");
+	
 		if(trenutni ==null){
-			if(projects.Count == 0) 
+			if(projects.Count == 0) {
 				projects.Add(new Project());
+				Debug.Log("gg");
+			}
 			trenutni = projects[0];
+			Debug.Log("ggvv");
 
 		}
 		else{
@@ -44,6 +51,9 @@ public class ZilaGUI : MonoBehaviour {
 
 	void OnGUI(){
 		if(trenutni ==null) return;
+
+		if(Event.current.type == EventType.mouseDown)
+			Save();
 
 		UpdateActiveMarker();
 		BackgroundGUI();
@@ -59,6 +69,7 @@ public class ZilaGUI : MonoBehaviour {
 		Rect desni = lijevi;	desni.position = new Vector2 (desni.position.x +desni.width + okvir.width*0.1f, desni.position.y);
 		Rect slike = okvir;		slike.y += slike.height;
 		Rect oznake = srednji;	oznake.width *= 1.5f; oznake.x = okvir.x -oznake.width -1;
+		Rect load = okvir; 		load.x += load.width;	load.width = srednji.width*3f;
 
 		GUI.Box(okvir, "");
 		{
@@ -124,14 +135,31 @@ public class ZilaGUI : MonoBehaviour {
 			else OznakeGUI(trenutni.trakt1, trenutni.trakt2);
 			GUILayout.EndArea();
 		}
+
+		GUI.Box(load, "");
+		{
+			GUILayout.BeginArea(load);
+			foreach (Project proj in projects){
+				if(GUILayout.Button(""+proj.name)){
+					trenutni = proj;
+				}
+			}
+			if(GUILayout.Button("novi")){
+				projects.Add(new Project());
+			}
+			GUILayout.EndArea();
+		}
 	}
 
 	#region funkcije
 	 
 	#region non-GUI
 
-	public void Save() {
-		projects.Add(trenutni);
+	public void Save(){
+		foreach(Project proj in projects){
+			proj.UpdateAllPojaveXY();
+		}
+
 		BinaryFormatter bf = new BinaryFormatter();
 		FileStream fs = File.Create (Application.persistentDataPath + "/SavedProjects.zile");
 		bf.Serialize(fs, projects);
@@ -144,6 +172,14 @@ public class ZilaGUI : MonoBehaviour {
 			FileStream fs = File.Open(Application.persistentDataPath + "/SavedProjects.zile", FileMode.Open);
 			projects = (List<Project>)bf.Deserialize(fs);
 			fs.Close();
+		}
+		else {
+			//TODO dangerous loop
+			Save();
+			Load();
+		}
+		foreach(Project proj in projects){
+			proj.UpdateAllPojave();
 		}
 	}
 
@@ -209,9 +245,9 @@ public class ZilaGUI : MonoBehaviour {
 		GUILayout.Label("promjer: ");
 		oznaka.scale = GUILayout.HorizontalSlider(oznaka.scale, 2f, 15f);
 		GUILayout.Label("boja, r-g-b: ");
-		oznaka.boja.r = GUILayout.HorizontalSlider(oznaka.boja.r, 0f, 1f);
-		oznaka.boja.g = GUILayout.HorizontalSlider(oznaka.boja.g, 0f, 1f);
-		oznaka.boja.b = GUILayout.HorizontalSlider(oznaka.boja.b, 0f, 1f);
+		oznaka._boja[0] = GUILayout.HorizontalSlider(oznaka._boja[0], 0f, 1f);
+		oznaka._boja[1] = GUILayout.HorizontalSlider(oznaka._boja[1], 0f, 1f);
+		oznaka._boja[2] = GUILayout.HorizontalSlider(oznaka._boja[2], 0f, 1f);
 		if(GUILayout.Button("" + (oznaka.kraticaListen ? "press key" : "key: "+oznaka.kratica.ToString()))){
 			oznaka.kraticaListen = true;
 		}
@@ -353,6 +389,7 @@ public class GiTrakt{
 
 	public float KvocijentPojedineSa(int i){
 		return (float)zile[i].pojave.Count/sa;
+		return 0;
 	}
 	public float KvocijentZbrojaZilaSa(){
 		float rez = 0;
@@ -368,23 +405,66 @@ public class Oznaka{
 	public string ime = "neimenovana oznaka";
 	public bool kraticaListen = false;	//TODO make global temp <string,bool> dictionary instead
 	public KeyCode kratica = KeyCode.None;
-	public Color boja = Color.green;
+	public float[] _boja = {1f,1f,0.5f,1f};
+	public Color boja{
+		get { return new Color(_boja[0], _boja[1], _boja[2], _boja[3]); }
+		set { _boja[0] = boja.r; _boja[1] = boja.g; _boja[2] = boja.b; _boja[3] = boja.a; }
+	}
 	public bool notHidden = true;
 	public float scale = 10f;		//pixels
-	public List<Vector2> pojave = new List<Vector2>();
 
+	public float[] pojaveX = {};
+	public float[] pojaveY = {};
+
+	[System.NonSerialized]public List<Vector2> pojave = new List<Vector2>();
+
+	public void UpdatePojave(){
+		List<Vector2> p = new List<Vector2>();
+		for (int i = 0; i < pojaveX.Length; ++i){
+			p.Add(new Vector2(pojaveX[i], pojaveY[i]));
+		}
+		pojave = p;
+	}
+
+	public void UpdatePojaveXY(){
+		int count = pojave.Count;
+			float[] pX = new float[count];
+			float[] pY = new float[count];
+			for (int i = 0; i < count; ++i){
+				pX[i] = pojave[i].x;
+				pY[i] = pojave[i].y;
+			}
+			pojaveX = pX;
+			pojaveY = pY;
+	}
+	
 	public float texToImageRatio = 0.01f;
-	public Texture2D tex = null;
+	[System.NonSerialized]public Texture2D tex = null;
 
-	public Oznaka(){}
+	public Oznaka(){
+		boja = Color.green;
+	}
 }
 
 [System.Serializable]
 public class Project{
+	public string name = "neimenovani projekt";
 	public GiTrakt trakt1 = new GiTrakt();
 	public GiTrakt trakt2 = new GiTrakt();
 
+	public void UpdateAllPojave(){
+		for(int i = 0; i < trakt1.zile.Count; ++i){
+			trakt1.zile[i].UpdatePojave();
+			trakt2.zile[i].UpdatePojave();
+		}
+	}
+
+	public void UpdateAllPojaveXY(){
+		for(int i = 0; i < trakt1.zile.Count; ++i){
+			trakt1.zile[i].UpdatePojaveXY();
+			trakt2.zile[i].UpdatePojaveXY();
+		}
+	}
+
 	public Project(){}
 }
-
-
