@@ -19,7 +19,8 @@ public class ZilaGUI : MonoBehaviour {
 	public Texture2D pictureRight;
 
 	bool crtajTrakt1 = true;
-	float eraseSize = 10f;
+	public float eraseSize = 20f;
+	bool drawEraser;
 
 	float zoomRate = 0.05f;
 	float zoom1 = 1f;
@@ -217,19 +218,34 @@ public class ZilaGUI : MonoBehaviour {
 				}
 			}
 
+			Rect aroundMouse = new Rect(Event.current.mousePosition.x -eraseSize/2f, Event.current.mousePosition.y -eraseSize/2f, eraseSize, eraseSize);
+			if(drawEraser){
+				GUI.Box(aroundMouse, "");
+			}
+
 			if(Event.current.isMouse && Event.current.button == 1){
-				Rect aroundMouse = new Rect(Event.current.mousePosition.x, Event.current.mousePosition.y, eraseSize, eraseSize);
+				drawEraser = true;
 				GiTrakt trakt = trenutni.trakt2;
-				if(crtajTrakt1) trakt = trenutni.trakt1;
+				Vector2 gridOffset = gridOffset2;
+				float zoom = zoom2;
+				if(crtajTrakt1){
+					trakt = trenutni.trakt1;
+					gridOffset = gridOffset1;
+					zoom = zoom1;
+				}
 				foreach(Oznaka oznaka in trakt.zile){
 					for(int i = 0; i < oznaka.pojave.Count; ++i){
 						Vector2 pojava = oznaka.pojave[i];
+						pojava = pojava*zoom +gridOffset;
+						pojava.x += oznaka.scale/2f;
+						pojava.y += oznaka.scale/2f;
 						if(aroundMouse.Contains(pojava) && oznaka.notHidden ==true){
 							oznaka.pojave.RemoveAt(i--);
 						}
 					}
 				}
 			}
+			if(Event.current.type == EventType.mouseUp && Event.current.button == 1) drawEraser = false;
 
 			if(crtajTrakt1) NacrtajPojave(trenutni.trakt1.zile);
 			else NacrtajPojave(trenutni.trakt2.zile);
