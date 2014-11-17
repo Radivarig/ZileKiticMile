@@ -119,6 +119,14 @@ public class ZilaGUI : MonoBehaviour {
 					GUILayout.Box("Kontrola");
 				}
 			}
+			GUILayout.Label("");
+			GUILayout.Label("");
+			GUILayout.Label("");
+			if(GUILayout.Button("Discard")){
+				if(crtajTrakt1)
+					pictureLeft = null;
+				else pictureRight = null;
+			}
 			GUILayout.EndVertical();
 			GUILayout.EndArea();
 		}
@@ -128,7 +136,7 @@ public class ZilaGUI : MonoBehaviour {
 			GUILayout.BeginArea(slike);
 			GUILayout.BeginHorizontal();
 
-			if(pictureLeft ==null){
+			if(pictureLeft ==null && crtajTrakt1){
 				trenutni.pictureLeftPath = GUILayout.TextField(trenutni.pictureLeftPath, GUILayout.Width(300));
 				if (Event.current.type == EventType.keyDown && Event.current.keyCode == KeyCode.Return ||
 				    GUILayout.Button("DRIVE:/path/to/{ BPC157 }.jpg")){
@@ -136,20 +144,20 @@ public class ZilaGUI : MonoBehaviour {
 				}
 
 			}
-			else if(pictureRight ==null){
+			else if(pictureRight ==null && crtajTrakt1 ==false){
 				trenutni.pictureRightPath = GUILayout.TextField(trenutni.pictureRightPath, GUILayout.Width(300));
 				if (Event.current.type == EventType.keyDown && Event.current.keyCode == KeyCode.Return ||
 				    GUILayout.Button("DRIVE:/path/to/{ Kontrola }.jpg")){
 					pictureRight = LoadImage(trenutni.pictureRightPath);
 				}
 			}
-			if(pictureLeft !=null && pictureRight !=null){
-				
-				if(crtajTrakt1){
-					slike.width = pictureLeft.width;
-					slike.height = pictureLeft.height;
-					GUI.DrawTexture(new Rect(0f, 0f, pictureLeft.width, pictureLeft.height), pictureLeft);
-				}else {
+			if(pictureLeft && crtajTrakt1){
+				slike.width = pictureLeft.width;
+				slike.height = pictureLeft.height;
+				GUI.DrawTexture(new Rect(0f, 0f, pictureLeft.width, pictureLeft.height), pictureLeft);
+			}
+			else{
+				if(pictureRight && crtajTrakt1 ==false){
 					slike.width = pictureRight.width;
 					slike.height = pictureRight.height;
 					GUI.DrawTexture(new Rect(0f, 0f, pictureRight.width, pictureRight.height), pictureRight);
