@@ -7,7 +7,7 @@ using System.IO;
 
 public class ZilaGUI : MonoBehaviour {
 	List<Project> projects = new List<Project>();
-	Project trenutni;
+	public Project trenutni;
 	
 	List<float> omjeri = new List<float>();
 	public Vector2 velicinaOkvira = new Vector2(0.6f, 0.45f);
@@ -16,10 +16,8 @@ public class ZilaGUI : MonoBehaviour {
 	public Texture2D bgOverlay;
 	public Texture2D dot;
 
-	Texture2D pictureLeft;
-	Texture2D pictureRight;
-	string pictureLeftPath = "";
-	string pictureRightPath = "";
+	public Texture2D pictureLeft;
+	public Texture2D pictureRight;
 
 	bool crtajTrakt1 = true;
 	float eraseSize = 10f;
@@ -65,9 +63,10 @@ public class ZilaGUI : MonoBehaviour {
 		Rect lijevi = okvir; 	lijevi.width *= 0.45f;
 		Rect srednji = lijevi;	srednji.width = okvir.width*0.1f;	srednji.x += lijevi.width;
 		Rect desni = lijevi;	desni.position = new Vector2 (desni.position.x +desni.width + okvir.width*0.1f, desni.position.y);
-		Rect slike = okvir;		slike.y += slike.height;
 		Rect oznake = srednji;	oznake.width *= 1.5f; oznake.x = okvir.x -oznake.width -1;
 		Rect load = okvir; 		load.x += load.width;	load.width = srednji.width*3f;
+		Rect slike = okvir;		slike.y += slike.height;
+
 
 		GUI.Box(okvir, "");
 		{
@@ -83,6 +82,7 @@ public class ZilaGUI : MonoBehaviour {
 			else if(GUILayout.Button(trenutni.name, GUILayout.MinWidth(150f))){
 				trenutni.uPreimenovanju = true;
 			}
+			crtajTrakt1 = GUILayout.Toggle(crtajTrakt1, ""+ (crtajTrakt1 ? "BPC157" : "Kontrola"));
 			GUILayout.FlexibleSpace();
 			GUILayout.EndHorizontal();
 			GUILayout.EndArea();
@@ -114,16 +114,35 @@ public class ZilaGUI : MonoBehaviour {
 		{
 			GUILayout.BeginArea(slike);
 			GUILayout.BeginHorizontal();
+
 			if(pictureLeft ==null){
-				if (Event.current.type == EventType.keyDown && Event.current.keyCode == KeyCode.Return){
-					if(Directory.Exists(pictureLeftPath))
-					{}
+				trenutni.pictureLeftPath = GUILayout.TextField(trenutni.pictureLeftPath, GUILayout.Width(300));
+				if (Event.current.type == EventType.keyDown && Event.current.keyCode == KeyCode.Return ||
+				    GUILayout.Button("DRIVE:/path/to/{ BPC157 }.jpg")){
+					pictureLeft = LoadImage(trenutni.pictureLeftPath);
 				}
-				pictureLeftPath = GUILayout.TextField(pictureLeftPath, GUILayout.Width(300));
 
 			}
-			if (GUILayout.Button("otvori sliku -BPC157")){}
-			if (GUILayout.Button("otvori sliku -Kontrola")){}
+			else if(pictureRight ==null){
+				trenutni.pictureRightPath = GUILayout.TextField(trenutni.pictureRightPath, GUILayout.Width(300));
+				if (Event.current.type == EventType.keyDown && Event.current.keyCode == KeyCode.Return ||
+				    GUILayout.Button("DRIVE:/path/to/{ Kontrola }.jpg")){
+					pictureRight = LoadImage(trenutni.pictureRightPath);
+				}
+			}
+			if(pictureLeft !=null && pictureRight !=null){
+				
+				if(crtajTrakt1){
+					slike.width = pictureLeft.width;
+					slike.height = pictureLeft.height;
+					GUI.DrawTexture(new Rect(0f, 0f, pictureLeft.width, pictureLeft.height), pictureLeft);
+				}else {
+					slike.width = pictureRight.width;
+					slike.height = pictureRight.height;
+					GUI.DrawTexture(new Rect(0f, 0f, pictureRight.width, pictureRight.height), pictureRight);
+				}
+			}
+
 			if(Event.current.type == EventType.mouseDown && Event.current.button == 0){
 				if(activeMarker !=null){
 					if(activeMarker.notHidden ==false) activeMarker.notHidden = true;
@@ -182,8 +201,20 @@ public class ZilaGUI : MonoBehaviour {
 	}
 
 	#region funkcije
-	 
+	
 	#region non-GUI
+	Texture2D LoadImage(string filePath){
+		
+		Texture2D tex = null;
+		byte[] fileData;
+		
+		if (File.Exists(filePath)){
+			fileData = File.ReadAllBytes(filePath);
+			tex = new Texture2D(200, 200);
+			tex.LoadImage(fileData); //..this will auto-resize the texture dimensions.
+		}
+		return tex;
+	}	
 
 	void Save(){
 		foreach(Project proj in projects){
@@ -271,8 +302,6 @@ public class ZilaGUI : MonoBehaviour {
 		GUI.color = oznaka.boja;
 
 		GUILayout.BeginVertical();
-		GUILayout.Label("");	//tip
-		GUILayout.Label("");	//ime
 		GUILayout.Label("promjer: ");
 		oznaka.scale = GUILayout.HorizontalSlider(oznaka.scale, 2f, 15f);
 		GUILayout.Label("boja, r-g-b: ");
@@ -442,7 +471,7 @@ public class Oznaka{
 	public string ime = "neimenovana_oznaka";
 	public bool kraticaListen = false;	//TODO make global temp <string,bool> dictionary instead
 	public KeyCode kratica = KeyCode.None;
-	public float[] _boja = {1f,1f,0.5f,1f};
+	public float[] _boja = {0f, 1f, 0f, 1f};
 	public Color boja{
 		get { return new Color(_boja[0], _boja[1], _boja[2], _boja[3]); }
 		set { _boja[0] = boja.r; _boja[1] = boja.g; _boja[2] = boja.b; _boja[3] = boja.a; }
@@ -489,6 +518,9 @@ public class Project{
 	public bool uPreimenovanju = false;	//TODO make temp global dict
 	public GiTrakt trakt1 = new GiTrakt();
 	public GiTrakt trakt2 = new GiTrakt();
+
+	public string pictureLeftPath = "";
+	public string pictureRightPath = "";
 
 	public void UpdateAllPojave(){
 		for(int i = 0; i < trakt1.zile.Count; ++i){
