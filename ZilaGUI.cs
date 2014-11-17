@@ -304,15 +304,15 @@ public class ZilaGUI : MonoBehaviour {
 		}
 
 		BinaryFormatter bf = new BinaryFormatter();
-		FileStream fs = File.Create (Application.persistentDataPath + "/SavedProjects.zile");
+		FileStream fs = File.Create (Application.streamingAssetsPath +"/SavedProjects.zile");
 		bf.Serialize(fs, projects);
 		fs.Close();
 	}   
 	
 	void Load() {
-		if(File.Exists(Application.persistentDataPath + "/SavedProjects.zile")) {
+		if(File.Exists(Application.streamingAssetsPath +"/SavedProjects.zile")) {
 			BinaryFormatter bf = new BinaryFormatter();
-			FileStream fs = File.Open(Application.persistentDataPath + "/SavedProjects.zile", FileMode.Open);
+			FileStream fs = File.Open(Application.streamingAssetsPath +"/SavedProjects.zile", FileMode.Open);
 			projects = (List<Project>)bf.Deserialize(fs);
 			fs.Close();
 		}
