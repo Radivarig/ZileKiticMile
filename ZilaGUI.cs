@@ -8,37 +8,29 @@ using System.IO;
 public class ZilaGUI : MonoBehaviour {
 	List<Project> projects = new List<Project>();
 	Project trenutni;
-
-	public string projectPath = "Assets/Saved";
-
+	
 	List<float> omjeri = new List<float>();
-	public Vector2 velicinaOkvira = new Vector2(500f, 250f);
+	Vector2 velicinaOkvira = new Vector2(500f, 250f);
 
-	public Texture2D bgTex;
-	public Texture2D workingPicture;
-	public Texture2D dot;
+	Texture2D bgTex;
+	Texture2D workingPicture;
+	Texture2D dot;
 
-	public bool crtajTrakt1 = true;
-	public float eraseSize = 10f;
+	bool crtajTrakt1 = true;
+	float eraseSize = 10f;
 
-	public int markerToEdit = -1;
-	public Oznaka activeMarker;
+	int markerToEdit = -1;
+	Oznaka activeMarker;
 
 	void Awake(){
 		Load();
 	}
 	void Update(){
-		if (projects ==null)
-			Debug.Log("fuckgg");
-	
 		if(trenutni ==null){
 			if(projects.Count == 0) {
 				projects.Add(new Project());
-				Debug.Log("gg");
 			}
 			trenutni = projects[0];
-			Debug.Log("ggvv");
-
 		}
 		else{
 			if(trenutni.trakt1.zile.Count == 0){
@@ -52,7 +44,7 @@ public class ZilaGUI : MonoBehaviour {
 	void OnGUI(){
 		if(trenutni ==null) return;
 
-		if(Event.current.type == EventType.mouseDown)
+		if(Event.current.type == EventType.mouseUp)
 			Save();
 
 		UpdateActiveMarker();
@@ -73,7 +65,23 @@ public class ZilaGUI : MonoBehaviour {
 
 		GUI.Box(okvir, "");
 		{
+			GUILayout.BeginArea(okvir);
+			GUILayout.BeginHorizontal();
+			GUILayout.FlexibleSpace();
+			if(trenutni.uPreimenovanju){
+				if (Event.current.type == EventType.keyDown && Event.current.keyCode == KeyCode.Return){
+					trenutni.uPreimenovanju = false;
+				}
+				trenutni.name = GUILayout.TextField(trenutni.name, GUI.skin.box, GUILayout.MinWidth(150f));
+			}
+			else if(GUILayout.Button(trenutni.name, GUILayout.MinWidth(150f))){
+				trenutni.uPreimenovanju = true;
+			}
+			GUILayout.FlexibleSpace();
+			GUILayout.EndHorizontal();
+			GUILayout.EndArea();
 			GUILayout.BeginArea(lijevi);
+			GUILayout.Label("");
 			GUILayout.BeginHorizontal();
 			GUILayout.FlexibleSpace();
 			GUILayout.Label("BPC157");
@@ -87,6 +95,7 @@ public class ZilaGUI : MonoBehaviour {
 			GUILayout.EndArea();
 			
 			GUILayout.BeginArea(desni);
+			GUILayout.Label("");
 			GUILayout.BeginHorizontal();
 			GUILayout.FlexibleSpace();
 			GUILayout.Label("Kontrola");
@@ -139,9 +148,14 @@ public class ZilaGUI : MonoBehaviour {
 		GUI.Box(load, "");
 		{
 			GUILayout.BeginArea(load);
-			foreach (Project proj in projects){
+			foreach (Project proj in projects.ToArray()){
 				if(GUILayout.Button(""+proj.name)){
 					trenutni = proj;
+				}
+				if(proj.name == "delete"){
+					if(GUILayout.Button(""+proj.name)){
+						projects.Remove(proj);
+					}
 				}
 			}
 			if(GUILayout.Button("novi")){
@@ -155,7 +169,7 @@ public class ZilaGUI : MonoBehaviour {
 	 
 	#region non-GUI
 
-	public void Save(){
+	void Save(){
 		foreach(Project proj in projects){
 			proj.UpdateAllPojaveXY();
 		}
@@ -166,7 +180,7 @@ public class ZilaGUI : MonoBehaviour {
 		fs.Close();
 	}   
 	
-	public void Load() {
+	void Load() {
 		if(File.Exists(Application.persistentDataPath + "/SavedProjects.zile")) {
 			BinaryFormatter bf = new BinaryFormatter();
 			FileStream fs = File.Open(Application.persistentDataPath + "/SavedProjects.zile", FileMode.Open);
@@ -224,6 +238,7 @@ public class ZilaGUI : MonoBehaviour {
 			activeMarker = null;
 		foreach(Oznaka oznaka in trenutni.trakt1.zile){
 			if(Event.current.keyCode != KeyCode.None && oznaka.kratica == Event.current.keyCode && Event.current.type == EventType.keyDown){
+				//TODO if not listening for rename
 				activeMarker = oznaka;
 				break;
 			}
@@ -389,7 +404,6 @@ public class GiTrakt{
 
 	public float KvocijentPojedineSa(int i){
 		return (float)zile[i].pojave.Count/sa;
-		return 0;
 	}
 	public float KvocijentZbrojaZilaSa(){
 		float rez = 0;
@@ -449,6 +463,7 @@ public class Oznaka{
 [System.Serializable]
 public class Project{
 	public string name = "neimenovani projekt";
+	public bool uPreimenovanju = false;	//TODO make temp global dict
 	public GiTrakt trakt1 = new GiTrakt();
 	public GiTrakt trakt2 = new GiTrakt();
 
