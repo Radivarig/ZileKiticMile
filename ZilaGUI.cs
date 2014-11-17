@@ -178,7 +178,11 @@ public class ZilaGUI : MonoBehaviour {
 						trenutni = null;
 						projects.Remove(proj);
 					}
-					else trenutni = proj;
+					else {
+						trenutni = proj;
+						pictureLeft = LoadImage(trenutni.pictureLeftPath);
+						pictureRight = LoadImage(trenutni.pictureRightPath);
+					}
 				}
 			}
 			GUILayout.Label("");
@@ -196,6 +200,7 @@ public class ZilaGUI : MonoBehaviour {
 		}
 		if(trenutni ==null){
 			trenutni = projects[0];
+
 			pictureLeft = LoadImage(trenutni.pictureLeftPath);
 			pictureRight = LoadImage(trenutni.pictureRightPath);
 
