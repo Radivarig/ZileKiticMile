@@ -530,7 +530,6 @@ public class Oznaka{
 		this.boja 	   = oznaka.boja;
 		this.kratica   = oznaka.kratica;
 		this.scale 	   = oznaka.scale;
-		this.notHidden = oznaka.notHidden;
 		this.ime 	   = oznaka.ime;
 	}
 }
