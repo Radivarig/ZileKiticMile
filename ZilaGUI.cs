@@ -69,14 +69,24 @@ public class ZilaGUI : MonoBehaviour {
 		Rect imgMenu = oznake;	imgMenu.y += imgMenu.height+1;
 
 		//if(Event.current.type == EventType.mouseDown && Event.current.button == 2) {
-			if(pictureLeft && crtajTrakt1){
-				gridOffset1.x = Mathf.Clamp(gridOffset1.x, slike.width -pictureLeft.width, 0f);
-				gridOffset1.y = Mathf.Clamp(gridOffset1.y, slike.height -pictureLeft.height, 0f);
-			}
-			if(pictureRight && crtajTrakt1 ==false){
-				gridOffset2.x = Mathf.Clamp(gridOffset2.x, slike.width -pictureRight.width, 0f);
-				gridOffset2.y = Mathf.Clamp(gridOffset2.y, slike.height -pictureRight.height, 0f);
-			} 
+		if(pictureLeft && crtajTrakt1){
+			float diffW = slike.width -pictureLeft.width;
+			float diffH = slike.height -pictureLeft.height;
+			if(diffW > 0) diffW = 0f;
+			if(diffH > 0) diffH = 0f;
+
+			gridOffset1.x = Mathf.Clamp(gridOffset1.x, diffW, 0f);
+			gridOffset1.y = Mathf.Clamp(gridOffset1.y, diffH, 0f);
+		}
+		if(pictureRight && crtajTrakt1 ==false){
+			float diffW = slike.width -pictureRight.width;
+			float diffH = slike.height -pictureRight.height;
+			if(diffW > 0) diffW = 0f;
+			if(diffH > 0) diffH = 0f;
+		
+			gridOffset2.x = Mathf.Clamp(gridOffset2.x, diffW, 0f);
+			gridOffset2.y = Mathf.Clamp(gridOffset2.y, diffH, 0f);
+		} 
 
 		//}
 	
