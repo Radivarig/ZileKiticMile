@@ -10,11 +10,13 @@ public class ZilaGUI : MonoBehaviour {
 	Project trenutni;
 	
 	List<float> omjeri = new List<float>();
-	Vector2 velicinaOkvira = new Vector2(500f, 250f);
+	public Vector2 velicinaOkvira = new Vector2(0.8f, 0.6f);
 
-	Texture2D bgTex;
-	Texture2D workingPicture;
-	Texture2D dot;
+	public Texture2D bgTex;
+	public Texture2D bgOverlay;
+	public Texture2D pictureLeft;
+	public Texture2D pictureRight;
+	public Texture2D dot;
 
 	bool crtajTrakt1 = true;
 	float eraseSize = 10f;
@@ -51,9 +53,10 @@ public class ZilaGUI : MonoBehaviour {
 		BackgroundGUI();
 
 		Rect okvir = new Rect();
-		okvir.size = velicinaOkvira;
+		Vector2 velOkvira = new Vector2(velicinaOkvira.x* Screen.width, velicinaOkvira.y *Screen.height);
+		okvir.size = velOkvira;
 		Vector2 _scr = new Vector2(Screen.width, Screen.height);
-		okvir.position = (_scr -velicinaOkvira)/2f;
+		okvir.position = (_scr -velOkvira)/2f;
 		okvir.y -= okvir.height/2f;
 
 		Rect lijevi = okvir; 	lijevi.width *= 0.45f;
@@ -297,6 +300,7 @@ public class ZilaGUI : MonoBehaviour {
 
 	void OznakeGUI(GiTrakt trakt1, GiTrakt trakt2){
 		GUILayout.BeginVertical();
+		GUILayout.Label("");	//projekt
 		GUILayout.Label("");	//tip
 		GUILayout.Label("");	//ime
 		GUILayout.Label("");	//zbroj
@@ -337,11 +341,17 @@ public class ZilaGUI : MonoBehaviour {
 	}
 
 	void BackgroundGUI(){
-		if(bgTex)
-		{
+		if(bgTex){
+			Rect scr = new Rect(0f, 0f, Screen.width, Screen.height);
+			GUI.DrawTexture(scr, bgTex);
+		}
+		if(bgOverlay){
+			Color temp = GUI.color;
+			GUI.color = new Color(temp.r, temp.g, temp.b, 0.85f);
 			bgTex.wrapMode = TextureWrapMode.Repeat;
 			Rect screenBounds = new Rect(0,0, Screen.width, Screen.height);
-			GUI.DrawTextureWithTexCoords(screenBounds, bgTex, new Rect(0, 0, screenBounds.width / bgTex.width, screenBounds.height / bgTex.height));
+			GUI.DrawTextureWithTexCoords(screenBounds, bgOverlay, new Rect(0, 0, screenBounds.width / bgOverlay.width, screenBounds.height / bgOverlay.height));
+			GUI.color = temp;
 		}
 	}
 
