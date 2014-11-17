@@ -22,6 +22,9 @@ public class ZilaGUI : MonoBehaviour {
 	bool crtajTrakt1 = true;
 	float eraseSize = 10f;
 
+	Vector2 gridOffset1 = new Vector2(0f, 0f);
+	Vector2 gridOffset2 = new Vector2(0f, 0f);
+
 	int markerToEdit = -1;
 	Oznaka activeMarker;
 
@@ -41,6 +44,11 @@ public class ZilaGUI : MonoBehaviour {
 
 		if(Event.current.type == EventType.mouseUp)
 			Save();
+
+		if(Event.current.type == EventType.mouseDrag && Event.current.button == 2){
+			if(crtajTrakt1) gridOffset1 += Event.current.delta;
+			else gridOffset2 += Event.current.delta;
+		}
 
 		UpdateActiveMarker();
 		BackgroundGUI();
@@ -323,7 +331,9 @@ public class ZilaGUI : MonoBehaviour {
 			Color temp = GUI.color;
 			GUI.color = oznaka.boja;
 			foreach(Vector2 pojava in oznaka.pojave){
-				Rect rect = new Rect(pojava.x -oznaka.scale/2f, pojava.y -oznaka.scale/2f, oznaka.scale, oznaka.scale);
+				Vector2 gridOffset = gridOffset2;
+				if(crtajTrakt1) gridOffset = gridOffset1;
+				Rect rect = new Rect(pojava.x -oznaka.scale/2f +gridOffset.x, pojava.y -oznaka.scale/2f +gridOffset.y, oznaka.scale, oznaka.scale);
 				GUI.DrawTexture(rect, dot);
 			}
 			GUI.color = temp;
