@@ -21,8 +21,9 @@ public class ZilaGUI : MonoBehaviour {
 	bool crtajTrakt1 = true;
 	float eraseSize = 10f;
 
-	public float zoom1 = 1f;
-	public float zoom2 = 1f;
+	float zoomRate = 0.05f;
+	float zoom1 = 1f;
+	float zoom2 = 1f;
 	Vector2 gridOffset1 = new Vector2(0f, 0f);
 	Vector2 gridOffset2 = new Vector2(0f, 0f);
 
@@ -41,6 +42,21 @@ public class ZilaGUI : MonoBehaviour {
 
 	void OnGUI(){
 		if(trenutni ==null) return;
+
+		if(Event.current.type == EventType.scrollWheel){
+			if(crtajTrakt1){
+				if(Event.current.delta.y < 0) zoom1 += zoomRate;
+				if(Event.current.delta.y > 0) zoom1 -= zoomRate;
+
+				zoom1 = Mathf.Clamp(zoom1, 0.4f, 2f);
+			}
+			else{
+				if(Event.current.delta.y < 0) zoom2 += zoomRate;
+				if(Event.current.delta.y > 0) zoom2 -= zoomRate;
+				
+				zoom2 = Mathf.Clamp(zoom2, 0.4f, 2f);
+			}
+		}
 
 		if(Event.current.type == EventType.mouseUp)
 			Save(trenutni.name);
@@ -380,9 +396,16 @@ public class ZilaGUI : MonoBehaviour {
 			Color temp = GUI.color;
 			GUI.color = oznaka.boja;
 			foreach(Vector2 pojava in oznaka.pojave){
+				float zoom = zoom2;
 				Vector2 gridOffset = gridOffset2;
-				if(crtajTrakt1) gridOffset = gridOffset1;
-				Rect rect = new Rect(pojava.x -oznaka.scale/2f +gridOffset.x, pojava.y -oznaka.scale/2f +gridOffset.y, oznaka.scale, oznaka.scale);
+				if(crtajTrakt1) {
+					zoom = zoom1;
+					gridOffset = gridOffset1;
+				}
+				float scale = oznaka.scale*zoom;
+				Rect rect = new Rect();
+				rect.position = pojava*zoom +gridOffset;
+				rect.size = Vector2.one*scale;
 				GUI.DrawTexture(rect, dot);
 			}
 			GUI.color = temp;
