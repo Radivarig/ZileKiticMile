@@ -450,6 +450,10 @@ public class ZilaGUI : MonoBehaviour {
 
 			}
 		}
+		if(activeMarker ==null){
+			if(crtajTrakt1) activeMarker = trenutni.trakt1.zile[0];
+			else activeMarker = trenutni.trakt2.zile[0];
+		}
 	}
 
 	void loadTrenutni(){
