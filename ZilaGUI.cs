@@ -21,6 +21,8 @@ public class ZilaGUI : MonoBehaviour {
 	bool crtajTrakt1 = true;
 	float eraseSize = 10f;
 
+	public float zoom1 = 1f;
+	public float zoom2 = 1f;
 	Vector2 gridOffset1 = new Vector2(0f, 0f);
 	Vector2 gridOffset2 = new Vector2(0f, 0f);
 
@@ -65,6 +67,7 @@ public class ZilaGUI : MonoBehaviour {
 		Rect load = okvir; 		load.x += load.width;	load.width = srednji.width*3f;
 		Rect slike = okvir;		slike.y += slike.height;
 		Rect imgMenu = oznake;	imgMenu.y += imgMenu.height+1;
+		Rect inicijali = imgMenu;	inicijali.y += inicijali.height; inicijali.height = 40f; inicijali.width = 1000f;
 
 		//if(Event.current.type == EventType.mouseDown && Event.current.button == 2) {
 		if(pictureLeft && crtajTrakt1){
@@ -264,6 +267,12 @@ public class ZilaGUI : MonoBehaviour {
 			if(GUILayout.Button("novi")){
 				Save();
 			}
+			GUILayout.EndArea();
+		}
+		//GUI.Box(inicijali, "");
+		{
+			GUILayout.BeginArea(inicijali);
+			GUILayout.Label("Koordinatorica: Dora Žaler (dora.zaler@gmail.com)" +"\t\t" +"tehnička pitanja: reslav.hollos@gmail.com" +"\t\t" +"licenca: MIT");
 			GUILayout.EndArea();
 		}
 	}
