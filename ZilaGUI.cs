@@ -14,9 +14,12 @@ public class ZilaGUI : MonoBehaviour {
 
 	public Texture2D bgTex;
 	public Texture2D bgOverlay;
-	public Texture2D pictureLeft;
-	public Texture2D pictureRight;
 	public Texture2D dot;
+
+	Texture2D pictureLeft;
+	Texture2D pictureRight;
+	string pictureLeftPath = "";
+	string pictureRightPath = "";
 
 	bool crtajTrakt1 = true;
 	float eraseSize = 10f;
@@ -111,6 +114,14 @@ public class ZilaGUI : MonoBehaviour {
 		{
 			GUILayout.BeginArea(slike);
 			GUILayout.BeginHorizontal();
+			if(pictureLeft ==null){
+				if (Event.current.type == EventType.keyDown && Event.current.keyCode == KeyCode.Return){
+					if(Directory.Exists(pictureLeftPath))
+					{}
+				}
+				pictureLeftPath = GUILayout.TextField(pictureLeftPath, GUILayout.Width(300));
+
+			}
 			if (GUILayout.Button("otvori sliku -BPC157")){}
 			if (GUILayout.Button("otvori sliku -Kontrola")){}
 			if(Event.current.type == EventType.mouseDown && Event.current.button == 0){
@@ -152,7 +163,9 @@ public class ZilaGUI : MonoBehaviour {
 		{
 			GUILayout.BeginArea(load);
 			foreach (Project proj in projects.ToArray()){
-				if(GUILayout.Button(""+proj.name)){
+				GUIStyle style = GUI.skin.button;
+				if(proj == trenutni) style = GUI.skin.box;
+				if(GUILayout.Button(""+proj.name, style)){
 					if(proj.name == "delete"){
 						trenutni = null;
 						projects.Remove(proj);
@@ -160,6 +173,7 @@ public class ZilaGUI : MonoBehaviour {
 					else trenutni = proj;
 				}
 			}
+			GUILayout.Label("");
 			if(GUILayout.Button("novi")){
 				projects.Add(new Project());
 			}
@@ -396,7 +410,7 @@ public class ZilaGUI : MonoBehaviour {
 }
 [System.Serializable]
 public class GiTrakt{
-	public string ime = "neimenovani trakt";
+	public string ime = "neimenovani_trakt";
 	public bool uPreimenovanju = false;		//TODO make global temp <string,bool> dictionary instead
 	public List<Oznaka> zile = new List<Oznaka>();
 	public int sa = 1;
@@ -425,7 +439,7 @@ public class GiTrakt{
 
 [System.Serializable]
 public class Oznaka{
-	public string ime = "neimenovana oznaka";
+	public string ime = "neimenovana_oznaka";
 	public bool kraticaListen = false;	//TODO make global temp <string,bool> dictionary instead
 	public KeyCode kratica = KeyCode.None;
 	public float[] _boja = {1f,1f,0.5f,1f};
@@ -471,7 +485,7 @@ public class Oznaka{
 
 [System.Serializable]
 public class Project{
-	public string name = "neimenovani projekt";
+	public string name = "neimenovani_projekt";
 	public bool uPreimenovanju = false;	//TODO make temp global dict
 	public GiTrakt trakt1 = new GiTrakt();
 	public GiTrakt trakt2 = new GiTrakt();
