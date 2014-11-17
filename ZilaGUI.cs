@@ -10,7 +10,7 @@ public class ZilaGUI : MonoBehaviour {
 	Project trenutni;
 	
 	List<float> omjeri = new List<float>();
-	public Vector2 velicinaOkvira = new Vector2(0.8f, 0.6f);
+	public Vector2 velicinaOkvira = new Vector2(0.6f, 0.45f);
 
 	public Texture2D bgTex;
 	public Texture2D bgOverlay;
@@ -153,12 +153,11 @@ public class ZilaGUI : MonoBehaviour {
 			GUILayout.BeginArea(load);
 			foreach (Project proj in projects.ToArray()){
 				if(GUILayout.Button(""+proj.name)){
-					trenutni = proj;
-				}
-				if(proj.name == "delete"){
-					if(GUILayout.Button(""+proj.name)){
+					if(proj.name == "delete"){
+						trenutni = null;
 						projects.Remove(proj);
 					}
+					else trenutni = proj;
 				}
 			}
 			if(GUILayout.Button("novi")){
