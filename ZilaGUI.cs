@@ -55,7 +55,7 @@ public class ZilaGUI : MonoBehaviour {
 		Rect oznake = srednji;	oznake.width *= 1.5f; oznake.x = okvir.x -oznake.width -1;
 		Rect load = okvir; 		load.x += load.width;	load.width = srednji.width*3f;
 		Rect slike = okvir;		slike.y += slike.height;
-
+		Rect imgMenu = oznake;	imgMenu.y += imgMenu.height+1;
 
 		GUI.Box(okvir, "");
 		{
@@ -71,7 +71,6 @@ public class ZilaGUI : MonoBehaviour {
 			else if(GUILayout.Button(trenutni.name, GUILayout.MinWidth(150f))){
 				trenutni.uPreimenovanju = true;
 			}
-			crtajTrakt1 = GUILayout.Toggle(crtajTrakt1, ""+ (crtajTrakt1 ? "BPC157" : "Kontrola"));
 			GUILayout.FlexibleSpace();
 			GUILayout.EndHorizontal();
 			GUILayout.EndArea();
@@ -99,6 +98,28 @@ public class ZilaGUI : MonoBehaviour {
 			ZileGUI(trenutni.trakt2);
 			GUILayout.EndArea();
 		}
+
+		GUI.Box(imgMenu, "");
+		{
+			GUILayout.BeginArea(imgMenu);
+			GUILayout.BeginVertical();
+			{
+				if(crtajTrakt1){
+					GUILayout.Box("BPC157");
+					if(GUILayout.Button("Kontrola"))
+					   crtajTrakt1 = false;
+
+				}
+				else{
+					if (GUILayout.Button("BPC157"))
+						crtajTrakt1 = true;
+					GUILayout.Box("Kontrola");
+				}
+			}
+			GUILayout.EndVertical();
+			GUILayout.EndArea();
+		}
+		
 		GUI.Box(slike, "");
 		{
 			GUILayout.BeginArea(slike);
