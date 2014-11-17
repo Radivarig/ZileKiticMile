@@ -503,7 +503,7 @@ public class ZilaGUI : MonoBehaviour {
 
 			GUILayout.BeginHorizontal();
 			{
-				GUILayout.Label("prosjek: " +suma + "/" +trakt.sa +" = " +trakt.KvocijentZbrojaZilaSa());
+				GUILayout.Label("prosjek: " +suma + "/" +trakt.sa +" = " +trakt.KvocijentZbrojaZilaSa(), GUILayout.Width(120));
 				
 				trakt.sa = (int)GUILayout.HorizontalSlider(trakt.sa, 1f, 5f);
 				GUILayout.Label("" +trakt.sa);
