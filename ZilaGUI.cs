@@ -324,9 +324,17 @@ public class ZilaGUI : MonoBehaviour {
 			activeMarker = null;
 		for(int i = 0; i < trenutni.trakt1.zile.Count; ++i){
 			if(Event.current.keyCode != KeyCode.None && trenutni.trakt1.zile[i].kratica == Event.current.keyCode && Event.current.type == EventType.keyDown){
-				if(crtajTrakt1)activeMarker = trenutni.trakt1.zile[i];	//TODO if not listening for rename
+				if(crtajTrakt1)
+					activeMarker = trenutni.trakt1.zile[i];	//TODO if not listening for rename
 				else activeMarker = trenutni.trakt2.zile[i];
 				break;
+			}
+			else{
+				if(activeMarker == trenutni.trakt1.zile[i] && crtajTrakt1 ==false)
+					activeMarker = trenutni.trakt2.zile[i];
+				if(activeMarker == trenutni.trakt2.zile[i] && crtajTrakt1)
+					activeMarker = trenutni.trakt1.zile[i];
+
 			}
 		}
 	}
