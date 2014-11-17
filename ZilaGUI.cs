@@ -324,6 +324,7 @@ public class ZilaGUI : MonoBehaviour {
 		GUILayout.Space(10);
 		if(GUILayout.Button("ok")){
 			markerToEdit = -1;
+			activeMarker = oznaka;
 		}
 		GUILayout.Space(10);
 		GUI.color = oznaka.boja;
