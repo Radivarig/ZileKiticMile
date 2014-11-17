@@ -71,8 +71,8 @@ public class ZilaGUI : MonoBehaviour {
 
 		//if(Event.current.type == EventType.mouseDown && Event.current.button == 2) {
 		if(pictureLeft && crtajTrakt1){
-			float diffW = slike.width -pictureLeft.width;
-			float diffH = slike.height -pictureLeft.height;
+			float diffW = slike.width -pictureLeft.width*zoom1;
+			float diffH = slike.height -pictureLeft.height*zoom1;
 			if(diffW > 0) diffW = 0f;
 			if(diffH > 0) diffH = 0f;
 
@@ -80,8 +80,8 @@ public class ZilaGUI : MonoBehaviour {
 			gridOffset1.y = Mathf.Clamp(gridOffset1.y, diffH, 0f);
 		}
 		if(pictureRight && crtajTrakt1 ==false){
-			float diffW = slike.width -pictureRight.width;
-			float diffH = slike.height -pictureRight.height;
+			float diffW = slike.width -pictureRight.width*zoom2;
+			float diffH = slike.height -pictureRight.height*zoom2;
 			if(diffW > 0) diffW = 0f;
 			if(diffH > 0) diffH = 0f;
 		
@@ -184,15 +184,11 @@ public class ZilaGUI : MonoBehaviour {
 				}
 			}
 			if(pictureLeft && crtajTrakt1){
-				slike.width = pictureLeft.width;
-				slike.height = pictureLeft.height;
-				GUI.DrawTexture(new Rect(0f +gridOffset1.x, 0f +gridOffset1.y, pictureLeft.width, pictureLeft.height), pictureLeft);
+				GUI.DrawTexture(new Rect(0f +gridOffset1.x, 0f +gridOffset1.y, pictureLeft.width*zoom1, pictureLeft.height*zoom1), pictureLeft);
 			}
 			else{
 				if(pictureRight && crtajTrakt1 ==false){
-					slike.width = pictureRight.width;
-					slike.height = pictureRight.height;
-					GUI.DrawTexture(new Rect(0f +gridOffset2.x, 0f +gridOffset2.y, pictureRight.width, pictureRight.height), pictureRight);
+					GUI.DrawTexture(new Rect(0f +gridOffset2.x, 0f +gridOffset2.y, pictureRight.width*zoom2 , pictureRight.height*zoom2), pictureRight);
 				}
 			}
 
