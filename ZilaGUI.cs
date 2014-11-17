@@ -7,7 +7,7 @@ using System.IO;
 
 public class ZilaGUI : MonoBehaviour {
 	List<Project> projects = new List<Project>();
-	public Project trenutni;
+	Project trenutni;
 	
 	List<float> omjeri = new List<float>();
 	public Vector2 velicinaOkvira = new Vector2(0.6f, 0.45f);
@@ -27,21 +27,10 @@ public class ZilaGUI : MonoBehaviour {
 
 	void Awake(){
 		Load();
+		trenutni = null;
 	}
 	void Update(){
-		if(trenutni ==null){
-			if(projects.Count == 0) {
-				projects.Add(new Project());
-			}
-			trenutni = projects[0];
-		}
-		else{
-			if(trenutni.trakt1.zile.Count == 0){
-				trenutni.trakt1.zile.Add(new Oznaka());
-				trenutni.trakt2.zile.Add(new Oznaka());
-			}
-			omjeri = Omjeri(trenutni.trakt1, trenutni.trakt2);
-		}
+		HandleTrenutni();
 	}
 
 	void OnGUI(){
@@ -200,6 +189,30 @@ public class ZilaGUI : MonoBehaviour {
 		}
 	}
 
+	void HandleTrenutni(){
+		if(projects.Count == 0) {
+			projects.Add(new Project());
+			trenutni = null;
+		}
+		if(trenutni ==null){
+			trenutni = projects[0];
+			pictureLeft = LoadImage(trenutni.pictureLeftPath);
+			pictureRight = LoadImage(trenutni.pictureRightPath);
+
+		}
+		else{
+			if(trenutni.trakt1.zile.Count == 0){
+				trenutni.trakt1.zile.Add(new Oznaka());
+				trenutni.trakt2.zile.Add(new Oznaka());
+			}
+			//TODO solve this with one unified marker
+			for(int i = 0; i < trenutni.trakt1.zile.Count; ++i){
+				trenutni.trakt2.zile[i].CopyFrom(trenutni.trakt1.zile[i]);
+			}
+			omjeri = Omjeri(trenutni.trakt1, trenutni.trakt2);
+		}
+	}
+
 	#region funkcije
 	
 	#region non-GUI
@@ -281,22 +294,27 @@ public class ZilaGUI : MonoBehaviour {
 	}
 
 	void UpdateActiveMarker(){
-		if(trenutni.trakt1.zile.Contains(activeMarker) ==false)
+		if(trenutni.trakt1.zile.Contains(activeMarker) ==false && trenutni.trakt2.zile.Contains(activeMarker) ==false)
 			activeMarker = null;
-		foreach(Oznaka oznaka in trenutni.trakt1.zile){
-			if(Event.current.keyCode != KeyCode.None && oznaka.kratica == Event.current.keyCode && Event.current.type == EventType.keyDown){
-				//TODO if not listening for rename
-				activeMarker = oznaka;
+		for(int i = 0; i < trenutni.trakt1.zile.Count; ++i){
+			if(Event.current.keyCode != KeyCode.None && trenutni.trakt1.zile[i].kratica == Event.current.keyCode && Event.current.type == EventType.keyDown){
+				if(crtajTrakt1)activeMarker = trenutni.trakt1.zile[i];	//TODO if not listening for rename
+				else activeMarker = trenutni.trakt2.zile[i];
 				break;
 			}
 		}
 	}
-	
+
+	void loadTrenutni(){
+
+	}
+
 	#endregion
 
 	#region GUI
 	void MarkerEditGUI(int markerIndex){
 		Oznaka oznaka = trenutni.trakt1.zile[markerIndex];
+		Oznaka oznaka2 = trenutni.trakt2.zile[markerIndex];
 
 		Color temp = GUI.color;
 		GUI.color = oznaka.boja;
@@ -320,11 +338,12 @@ public class ZilaGUI : MonoBehaviour {
 			}
 		}
 		GUI.color = temp;
-		
+	
 		GUILayout.Space(10);
 		if(GUILayout.Button("ok")){
 			markerToEdit = -1;
-			activeMarker = oznaka;
+			if(crtajTrakt1) activeMarker = oznaka;
+			else activeMarker = oznaka2;
 		}
 		GUILayout.Space(10);
 		GUI.color = oznaka.boja;
@@ -353,7 +372,7 @@ public class ZilaGUI : MonoBehaviour {
 			Color temp = GUI.color;
 			GUI.color = trakt1.zile[i].boja;
 			
-			if(GUILayout.Button("" +(activeMarker == trakt1.zile[i] ? "[*] ": "") + trakt1.zile[i].kratica.ToString())){
+			if(GUILayout.Button("" +((activeMarker == trakt1.zile[i] || activeMarker == trakt2.zile[i]) ? "[*] ": "") + trakt1.zile[i].kratica.ToString())){
 				markerToEdit = i;
 			}
 			GUI.color = temp;
@@ -505,11 +524,14 @@ public class Oznaka{
 			pojaveY = pY;
 	}
 	
-	public float texToImageRatio = 0.01f;
-	[System.NonSerialized]public Texture2D tex = null;
+	public Oznaka(){}
 
-	public Oznaka(){
-		boja = Color.green;
+	public void CopyFrom(Oznaka oznaka){
+		this.boja 	   = oznaka.boja;
+		this.kratica   = oznaka.kratica;
+		this.scale 	   = oznaka.scale;
+		this.notHidden = oznaka.notHidden;
+		this.ime 	   = oznaka.ime;
 	}
 }
 
