@@ -7,7 +7,7 @@ using System.IO;
 
 public class ZilaGUI : MonoBehaviour {
 	List<Project> projects = new List<Project>();
-	Project trenutni;
+	Project trenutni = null;
 	
 	List<float> omjeri = new List<float>();
 	public Vector2 velicinaOkvira = new Vector2(0.6f, 0.45f);
@@ -34,6 +34,9 @@ public class ZilaGUI : MonoBehaviour {
 	}
 
 	void OnGUI(){
+		if(projects.Contains(trenutni) ==false) 
+			trenutni = null;
+
 		if(trenutni ==null) return;
 
 		if(Event.current.type == EventType.mouseUp)
