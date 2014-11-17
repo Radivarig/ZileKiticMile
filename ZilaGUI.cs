@@ -496,7 +496,7 @@ public class ZilaGUI : MonoBehaviour {
 }
 [System.Serializable]
 public class GiTrakt{
-	public string ime = "neimenovani_trakt";
+	public string ime = "neimenovaniTrakt";
 	public bool uPreimenovanju = false;		//TODO make global temp <string,bool> dictionary instead
 	public List<Oznaka> zile = new List<Oznaka>();
 	public int sa = 1;
@@ -525,7 +525,7 @@ public class GiTrakt{
 
 [System.Serializable]
 public class Oznaka{
-	public string ime = "neimenovana_oznaka";
+	public string ime = "neimenovanaOznaka";
 	public bool kraticaListen = false;	//TODO make global temp <string,bool> dictionary instead
 	public KeyCode kratica = KeyCode.None;
 	public float[] _boja = {0f, 1f, 0f, 1f};
@@ -576,7 +576,7 @@ public class Oznaka{
 
 [System.Serializable]
 public class Project{
-	public string name = "neimenovani_projekt";
+	public string name = "neimenovaniProjekt";
 	public bool uPreimenovanju = false;	//TODO make temp global dict
 	public GiTrakt trakt1 = new GiTrakt();
 	public GiTrakt trakt2 = new GiTrakt();
