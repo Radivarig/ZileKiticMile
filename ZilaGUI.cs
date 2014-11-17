@@ -175,7 +175,9 @@ public class ZilaGUI : MonoBehaviour {
 			if(Event.current.type == EventType.mouseDown && Event.current.button == 0){
 				if(activeMarker !=null){
 					if(activeMarker.notHidden ==false) activeMarker.notHidden = true;
-					activeMarker.pojave.Add(Event.current.mousePosition);
+					Vector2 offset = gridOffset2;
+					if(crtajTrakt1) offset = gridOffset1;
+					activeMarker.pojave.Add(Event.current.mousePosition - offset);
 				}
 			}
 
