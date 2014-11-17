@@ -68,6 +68,18 @@ public class ZilaGUI : MonoBehaviour {
 		Rect slike = okvir;		slike.y += slike.height;
 		Rect imgMenu = oznake;	imgMenu.y += imgMenu.height+1;
 
+		//if(Event.current.type == EventType.mouseDown && Event.current.button == 2) {
+			if(pictureLeft && crtajTrakt1){
+				gridOffset1.x = Mathf.Clamp(gridOffset1.x, slike.width -pictureLeft.width, 0f);
+				gridOffset1.y = Mathf.Clamp(gridOffset1.y, slike.height -pictureLeft.height, 0f);
+			}
+			if(pictureRight && crtajTrakt1 ==false){
+				gridOffset2.x = Mathf.Clamp(gridOffset2.x, slike.width -pictureRight.width, 0f);
+				gridOffset2.y = Mathf.Clamp(gridOffset2.y, slike.height -pictureRight.height, 0f);
+			} 
+
+		//}
+	
 		GUI.Box(okvir, "");
 		{
 			GUILayout.BeginArea(okvir);
