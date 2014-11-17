@@ -6,7 +6,6 @@ using System.Runtime.Serialization.Formatters.Binary;
 using System.IO;
 
 public class ZilaGUI : MonoBehaviour {
-	List<Project> projects = new List<Project>();
 	Project trenutni = null;
 	
 	List<float> omjeri = new List<float>();
@@ -25,6 +24,8 @@ public class ZilaGUI : MonoBehaviour {
 	Vector2 gridOffset1 = new Vector2(0f, 0f);
 	Vector2 gridOffset2 = new Vector2(0f, 0f);
 
+	FileInfo[] fileInfo = new FileInfo[0]; 
+
 	int markerToEdit = -1;
 	Oznaka activeMarker;
 
@@ -37,13 +38,10 @@ public class ZilaGUI : MonoBehaviour {
 	}
 
 	void OnGUI(){
-		if(projects.Contains(trenutni) ==false) 
-			trenutni = null;
-
 		if(trenutni ==null) return;
 
 		if(Event.current.type == EventType.mouseUp)
-			Save();
+			Save(trenutni.name);
 
 		if(Event.current.type == EventType.mouseDrag && Event.current.button == 2){
 			if(crtajTrakt1) gridOffset1 += Event.current.delta;
@@ -95,13 +93,14 @@ public class ZilaGUI : MonoBehaviour {
 			GUILayout.BeginArea(okvir);
 			GUILayout.BeginHorizontal();
 			GUILayout.FlexibleSpace();
-			if(trenutni.uPreimenovanju){
+			/*if(trenutni.uPreimenovanju){
 				if (Event.current.type == EventType.keyDown && Event.current.keyCode == KeyCode.Return){
 					trenutni.uPreimenovanju = false;
 				}
 				trenutni.name = GUILayout.TextField(trenutni.name, GUI.skin.box, GUILayout.MinWidth(150f));
 			}
-			else if(GUILayout.Button(trenutni.name, GUILayout.MinWidth(150f))){
+			else 
+			*/if(GUILayout.Button(trenutni.name, GUILayout.MinWidth(150f))){
 				trenutni.uPreimenovanju = true;
 			}
 			GUILayout.FlexibleSpace();
@@ -234,37 +233,50 @@ public class ZilaGUI : MonoBehaviour {
 		GUI.Box(load, "");
 		{
 			GUILayout.BeginArea(load);
-			foreach (Project proj in projects.ToArray()){
+
+			RefreshStorageFileInfo();
+			bool existsInFolder = false;
+			foreach (FileInfo f in fileInfo){
 				GUIStyle style = GUI.skin.button;
-				if(proj == trenutni) style = GUI.skin.box;
-				if(GUILayout.Button(""+proj.name, style)){
-					if(proj.name == "delete"){
+				if(f.Name == trenutni.name){
+					style = GUI.skin.box;
+					existsInFolder = true;
+				} 
+
+				string name = f.Name.Substring(0, f.Name.Length -5);		//-6 is '.assets'
+				if(GUILayout.Button(name, style)){
+					if(trenutni.name == "delete"){
 						trenutni = null;
-						projects.Remove(proj);
+						File.Delete(f.FullName);
 					}
 					else {
-						trenutni = proj;
+						Load(f.Name);
 						pictureLeft = LoadImage(trenutni.pictureLeftPath);
 						pictureRight = LoadImage(trenutni.pictureRightPath);
 					}
 				}
 			}
+			if(existsInFolder ==false){
+				trenutni = null;
+			}
+		
 			GUILayout.Label("");
 			if(GUILayout.Button("novi")){
-				projects.Add(new Project());
+				Save();
 			}
 			GUILayout.EndArea();
 		}
 	}
 
+	#region funkcije
 	void HandleTrenutni(){
-		if(projects.Count == 0) {
-			projects.Add(new Project());
-			trenutni = null;
-		}
 		if(trenutni ==null){
-			trenutni = projects[0];
-
+			RefreshStorageFileInfo();
+			foreach (FileInfo f in fileInfo){
+				Load (f.Name);
+				break;
+			}
+			if(trenutni ==null) Save();
 			pictureLeft = LoadImage(trenutni.pictureLeftPath);
 			pictureRight = LoadImage(trenutni.pictureRightPath);
 
@@ -281,8 +293,13 @@ public class ZilaGUI : MonoBehaviour {
 			omjeri = Omjeri(trenutni.trakt1, trenutni.trakt2);
 		}
 	}
-
-	#region funkcije
+	
+	void RefreshStorageFileInfo(){
+		string myPath = Application.streamingAssetsPath;
+		if(Directory.Exists(myPath) ==false) Directory.CreateDirectory(myPath);
+		DirectoryInfo dir = new DirectoryInfo(myPath);
+		fileInfo = dir.GetFiles("*.zile");
+	}
 	
 	#region non-GUI
 	Texture2D LoadImage(string filePath){
@@ -298,32 +315,35 @@ public class ZilaGUI : MonoBehaviour {
 		return tex;
 	}	
 
-	void Save(){
-		foreach(Project proj in projects){
-			proj.UpdateAllPojaveXY();
-		}
+	void Save(string fname = ""){
+		if(trenutni == null)
+			trenutni = new Project();
 
+		trenutni.UpdateAllPojaveXY();
+		string basePath =  Application.streamingAssetsPath;
+		if (fname == "") fname = System.DateTime.Now.Day +"-"+System.DateTime.Now.Month +"-"+System.DateTime.Now.Year +"-" +System.DateTime.Now.Hour +"-" +System.DateTime.Now.Second +"-" +System.DateTime.Now.Millisecond +".zile";
+
+		string fullPath = basePath +"/" +fname;
 		BinaryFormatter bf = new BinaryFormatter();
-		FileStream fs = File.Create (Application.streamingAssetsPath +"/SavedProjects.zile");
-		bf.Serialize(fs, projects);
+		FileStream fs = File.Create (fullPath);
+		bf.Serialize(fs, trenutni);
 		fs.Close();
 	}   
 	
-	void Load() {
-		if(File.Exists(Application.streamingAssetsPath +"/SavedProjects.zile")) {
+	void Load(string fname = "") {
+		string basePath =  Application.streamingAssetsPath;
+		string fullPath = basePath +"/" +fname;
+		if(File.Exists(fullPath)) {
 			BinaryFormatter bf = new BinaryFormatter();
-			FileStream fs = File.Open(Application.streamingAssetsPath +"/SavedProjects.zile", FileMode.Open);
-			projects = (List<Project>)bf.Deserialize(fs);
+			FileStream fs = File.Open(fullPath, FileMode.Open);
+			trenutni = (Project)bf.Deserialize(fs);
 			fs.Close();
 		}
-		else {
-			//TODO dangerous loop
-			Save();
-			Load();
-		}
-		foreach(Project proj in projects){
-			proj.UpdateAllPojave();
-		}
+
+		if (trenutni !=null){
+			trenutni.UpdateAllPojave();
+			trenutni.name = fname;
+		} 
 	}
 
 	float RoundToDecimal(float value, int dec){
