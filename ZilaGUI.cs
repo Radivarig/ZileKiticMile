@@ -347,7 +347,7 @@ public class ZilaGUI : MonoBehaviour {
 		if(bgOverlay){
 			Color temp = GUI.color;
 			GUI.color = new Color(temp.r, temp.g, temp.b, 0.85f);
-			bgTex.wrapMode = TextureWrapMode.Repeat;
+			bgOverlay.wrapMode = TextureWrapMode.Repeat;
 			Rect screenBounds = new Rect(0,0, Screen.width, Screen.height);
 			GUI.DrawTextureWithTexCoords(screenBounds, bgOverlay, new Rect(0, 0, screenBounds.width / bgOverlay.width, screenBounds.height / bgOverlay.height));
 			GUI.color = temp;
