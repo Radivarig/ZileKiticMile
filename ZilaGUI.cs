@@ -561,10 +561,13 @@ public class Oznaka{
 	public Oznaka(){}
 
 	public void CopyFrom(Oznaka oznaka){
-		this.boja 	   = oznaka.boja;
-		this.kratica   = oznaka.kratica;
-		this.scale 	   = oznaka.scale;
-		this.ime 	   = oznaka.ime;
+		//this.boja   = oznaka.boja;
+		this._boja[0] = oznaka._boja[0];
+		this._boja[1] = oznaka._boja[1];
+		this._boja[2] = oznaka._boja[2];
+		this.kratica  = oznaka.kratica;
+		this.scale 	  = oznaka.scale;
+		this.ime 	  = oznaka.ime;
 	}
 }
 
