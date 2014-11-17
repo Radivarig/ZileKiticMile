@@ -270,34 +270,28 @@ public class ZilaGUI : MonoBehaviour {
 			GUILayout.BeginArea(load);
 
 			RefreshStorageFileInfo();
-			bool existsInFolder = false;
 			foreach (FileInfo f in fileInfo){
 				GUIStyle style = GUI.skin.button;
-				if(f.Name == trenutni.name){
-					style = GUI.skin.box;
-					existsInFolder = true;
-				} 
+				if(f.Name == trenutni.name) style = GUI.skin.box;
 
 				string name = f.Name.Substring(0, f.Name.Length -5);		//-6 is '.assets'
-				if(GUILayout.Button(name, style)){
-					if(trenutni.name == "delete"){
+				if(GUILayout.Button(name, style))
+				{
+					/*if(trenutni.name == "delete"){
 						trenutni = null;
 						File.Delete(f.FullName);
 					}
-					else {
+					else */{
 						Load(f.Name);
-						pictureLeft = LoadImage(trenutni.pictureLeftPath);
-						pictureRight = LoadImage(trenutni.pictureRightPath);
 					}
 				}
 			}
-			if(existsInFolder ==false){
-				trenutni = null;
-			}
-		
 			GUILayout.Label("");
 			if(GUILayout.Button("novi")){
+				trenutni = null;
 				Save();
+				Debug.Log("trenu"+trenutni.name);
+
 			}
 			GUILayout.EndArea();
 		}
@@ -311,16 +305,18 @@ public class ZilaGUI : MonoBehaviour {
 
 	#region funkcije
 	void HandleTrenutni(){
+		//TODO combine to have it in 1 run 
+		bool existsInFolder = false;
+
 		if(trenutni ==null){
 			RefreshStorageFileInfo();
 			foreach (FileInfo f in fileInfo){
-				Load (f.Name);
+				Debug.Log ("ddddfd");
+				Load(f.Name);
+
 				break;
 			}
 			if(trenutni ==null) Save();
-			pictureLeft = LoadImage(trenutni.pictureLeftPath);
-			pictureRight = LoadImage(trenutni.pictureRightPath);
-
 		}
 		else{
 			if(trenutni.trakt1.zile.Count == 0){
@@ -333,6 +329,12 @@ public class ZilaGUI : MonoBehaviour {
 			}
 			omjeri = Omjeri(trenutni.trakt1, trenutni.trakt2);
 		}
+
+		RefreshStorageFileInfo();
+		foreach (FileInfo f in fileInfo){
+			if(f.Name == trenutni.name) existsInFolder = true;
+		}
+		if(existsInFolder ==false) trenutni = null;
 	}
 	
 	void RefreshStorageFileInfo(){
@@ -363,6 +365,7 @@ public class ZilaGUI : MonoBehaviour {
 		trenutni.UpdateAllPojaveXY();
 		string basePath =  Application.streamingAssetsPath;
 		if (fname == "") fname = System.DateTime.Now.Day +"-"+System.DateTime.Now.Month +"-"+System.DateTime.Now.Year +"-" +System.DateTime.Now.Hour +"-" +System.DateTime.Now.Second +"-" +System.DateTime.Now.Millisecond +".zile";
+		trenutni.name = fname;
 
 		string fullPath = basePath +"/" +fname;
 		BinaryFormatter bf = new BinaryFormatter();
@@ -377,6 +380,7 @@ public class ZilaGUI : MonoBehaviour {
 		if(File.Exists(fullPath)) {
 			BinaryFormatter bf = new BinaryFormatter();
 			FileStream fs = File.Open(fullPath, FileMode.Open);
+
 			trenutni = (Project)bf.Deserialize(fs);
 			fs.Close();
 		}
@@ -384,7 +388,15 @@ public class ZilaGUI : MonoBehaviour {
 		if (trenutni !=null){
 			trenutni.UpdateAllPojave();
 			trenutni.name = fname;
-		} 
+			Debug.Log("" +fname);
+			pictureLeft = LoadImage(trenutni.pictureLeftPath);
+			pictureRight = LoadImage(trenutni.pictureRightPath);
+		}
+		else {
+			//TODO neccessery?
+			pictureLeft = null;
+			pictureRight = null;
+		}
 	}
 
 	float RoundToDecimal(float value, int dec){
@@ -451,13 +463,11 @@ public class ZilaGUI : MonoBehaviour {
 			}
 		}
 		if(activeMarker ==null){
-			if(crtajTrakt1) activeMarker = trenutni.trakt1.zile[0];
-			else activeMarker = trenutni.trakt2.zile[0];
+			if(trenutni !=null && trenutni.trakt1.zile.Count != 0){
+				if(crtajTrakt1) activeMarker = trenutni.trakt1.zile[0];
+				else activeMarker = trenutni.trakt2.zile[0];
+			}
 		}
-	}
-
-	void loadTrenutni(){
-
 	}
 
 	#endregion
