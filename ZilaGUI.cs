@@ -237,17 +237,17 @@ public class ZilaGUI : MonoBehaviour {
 					gridOffset = gridOffset1;
 					zoom = zoom1;
 				}
-				foreach(Oznaka oznaka in trakt.zile){
-					for(int i = 0; i < oznaka.pojave.Count; ++i){
-						Vector2 pojava = oznaka.pojave[i];
+				//foreach(Oznaka oznaka in trakt.zile){
+					for(int i = 0; i < activeMarker.pojave.Count; ++i){
+						Vector2 pojava = activeMarker.pojave[i];
 						pojava = pojava*zoom +gridOffset;
-						pojava.x += oznaka.scale/2f;
-						pojava.y += oznaka.scale/2f;
-						if(aroundMouse.Contains(pojava) && oznaka.notHidden ==true){
-							oznaka.pojave.RemoveAt(i--);
+						pojava.x += activeMarker.scale/2f;
+						pojava.y += activeMarker.scale/2f;
+						if(aroundMouse.Contains(pojava) && activeMarker.notHidden ==true){
+							activeMarker.pojave.RemoveAt(i--);
 						}
 					}
-				}
+				//}
 			}
 			if(Event.current.type == EventType.mouseUp && Event.current.button == 1) drawEraser = false;
 
@@ -311,7 +311,6 @@ public class ZilaGUI : MonoBehaviour {
 		if(trenutni ==null){
 			RefreshStorageFileInfo();
 			foreach (FileInfo f in fileInfo){
-				Debug.Log ("ddddfd");
 				Load(f.Name);
 
 				break;
@@ -413,7 +412,6 @@ public class ZilaGUI : MonoBehaviour {
 		if (trenutni !=null){
 			trenutni.UpdateAllPojave();
 			trenutni.name = fname;
-			Debug.Log("" +fname);
 			pictureLeft = LoadImage(trenutni.pictureLeftPath);
 			pictureRight = LoadImage(trenutni.pictureRightPath);
 		}
