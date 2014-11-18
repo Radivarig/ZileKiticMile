@@ -408,12 +408,13 @@ public class ZilaGUI : MonoBehaviour {
 	}
 	
 	void Save(string fname = ""){
-		if(trenutni == null)
+		if(trenutni == null){
+			pictureLeft = null;
+			pictureRight = null;
 			trenutni = new Project();
+		}
 		trenutni.UpdateAllPojaveXY();
 
-		Debug.Log(trenutni.pictureLeftPath);
-		Debug.Log(trenutni.pictureRightPath);
 		if (fname == "") fname = FolderDateName("zile");
 		trenutni.name = fname;
 		string basePath =  Application.streamingAssetsPath;
