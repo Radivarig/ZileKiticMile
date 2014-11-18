@@ -364,7 +364,32 @@ public class ZilaGUI : MonoBehaviour {
 
 		trenutni.UpdateAllPojaveXY();
 		string basePath =  Application.streamingAssetsPath;
-		if (fname == "") fname = System.DateTime.Now.Day +"-"+System.DateTime.Now.Month +"-"+System.DateTime.Now.Year +"-" +System.DateTime.Now.Hour +"-" +System.DateTime.Now.Second +"-" +System.DateTime.Now.Millisecond +".zile";
+		if (fname == "") {
+			string day = System.DateTime.Now.Day.ToString();
+			if (day.Length == 1) day = "0" +day;
+
+			string month = System.DateTime.Now.Month.ToString();
+			if (month.Length == 1) month = "0" +month;
+
+			string year = System.DateTime.Now.Year.ToString().Substring(2);
+
+			string hour = System.DateTime.Now.Hour.ToString();
+			if (hour.Length == 1) hour = "0" +hour;
+
+			string minute = System.DateTime.Now.Minute.ToString();
+			if (minute.Length == 1) minute = "0" +minute;
+
+			string second = System.DateTime.Now.Second.ToString();
+			if (second.Length == 1) second = "0" +second;
+
+			string milisec = System.DateTime.Now.Millisecond.ToString();
+			if (milisec.Length == 2) milisec = "0" +milisec;
+			if (milisec.Length == 1) milisec = "00" +milisec;
+
+			string[] date = { day, month, year, hour, minute, second, milisec };
+
+			fname = string.Join ("-", date) + ".zile";
+		}
 		trenutni.name = fname;
 
 		string fullPath = basePath +"/" +fname;
