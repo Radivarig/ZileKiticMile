@@ -6,7 +6,7 @@ using System.Runtime.Serialization.Formatters.Binary;
 using System.IO;
 
 public class ZilaGUI : MonoBehaviour {
-	Project trenutni = null;
+	public Project trenutni = null;
 	
 	List<float> omjeri = new List<float>();
 	public Vector2 velicinaOkvira = new Vector2(0.6f, 0.45f);
@@ -17,6 +17,11 @@ public class ZilaGUI : MonoBehaviour {
 
 	public Texture2D pictureLeft;
 	public Texture2D pictureRight;
+
+	public string searchPath;
+
+	Vector2 scroll1 = Vector2.zero;
+	Vector2 scroll2 = Vector2.zero;
 
 	bool crtajTrakt1 = true;
 	public float eraseSize = 20f;
@@ -36,6 +41,9 @@ public class ZilaGUI : MonoBehaviour {
 	void Awake(){
 		Load();
 		trenutni = null;
+	}
+	void Start(){
+		searchPath = Application.streamingAssetsPath +"/Slike";
 	}
 	void Update(){
 		HandleTrenutni();
@@ -171,9 +179,10 @@ public class ZilaGUI : MonoBehaviour {
 			GUILayout.Label("");
 			GUILayout.Label("");
 			GUILayout.Label("");
-			if(GUILayout.Button("Discard")){
-				if(crtajTrakt1)
+			if(GUILayout.Button("zamjeni")){
+				if(crtajTrakt1){
 					pictureLeft = null;
+				}
 				else pictureRight = null;
 			}
 			GUILayout.EndVertical();
@@ -183,23 +192,38 @@ public class ZilaGUI : MonoBehaviour {
 		GUI.Box(slike, "");
 		{
 			GUILayout.BeginArea(slike);
-			GUILayout.BeginHorizontal();
 
 			if(pictureLeft ==null && crtajTrakt1){
-				trenutni.pictureLeftPath = GUILayout.TextField(trenutni.pictureLeftPath, GUILayout.Width(300));
-				if (Event.current.type == EventType.keyDown && Event.current.keyCode == KeyCode.Return ||
-				    GUILayout.Button("DRIVE:/path/to/{ BPC157 }.jpg")){
-					pictureLeft = LoadImage(trenutni.pictureLeftPath);
+				scroll1 = GUILayout.BeginScrollView(scroll1);
+				searchPath = GUILayout.TextField(searchPath);
+				RefreshStorageFileInfo(searchPath, "*", false);
+				foreach (FileInfo f in fileInfo){
+					if(f.Name.EndsWith(".meta") ==false)
+					{
+						if(GUILayout.Button(f.Name)){
+							trenutni.pictureLeftPath = searchPath+ "/" +f.Name;
+							pictureLeft = LoadImage(trenutni.pictureLeftPath);
+						}
+					}	
 				}
-
+				GUILayout.EndScrollView();
 			}
 			else if(pictureRight ==null && crtajTrakt1 ==false){
-				trenutni.pictureRightPath = GUILayout.TextField(trenutni.pictureRightPath, GUILayout.Width(300));
-				if (Event.current.type == EventType.keyDown && Event.current.keyCode == KeyCode.Return ||
-				    GUILayout.Button("DRIVE:/path/to/{ Kontrola }.jpg")){
-					pictureRight = LoadImage(trenutni.pictureRightPath);
+				scroll1 = GUILayout.BeginScrollView(scroll1);
+				searchPath = GUILayout.TextField(searchPath);
+				RefreshStorageFileInfo(searchPath, "*", false);
+				foreach (FileInfo f in fileInfo){
+					if(f.Name.EndsWith(".meta") ==false)
+					{
+						if(GUILayout.Button(f.Name)){
+						trenutni.pictureRightPath = searchPath+ "/" +f.Name;
+						pictureRight = LoadImage(trenutni.pictureRightPath);
+						}
+					}
 				}
+				GUILayout.EndScrollView();
 			}
+			GUILayout.BeginHorizontal();
 			if(pictureLeft && crtajTrakt1){
 				GUI.DrawTexture(new Rect(0f +gridOffset1.x, 0f +gridOffset1.y, pictureLeft.width*zoom1, pictureLeft.height*zoom1), pictureLeft);
 			}
@@ -214,11 +238,13 @@ public class ZilaGUI : MonoBehaviour {
 					if(activeMarker.notHidden ==false) activeMarker.notHidden = true;
 					Vector2 offset = gridOffset2;
 					float zoom = zoom2;
+					bool crtaj = pictureLeft !=null;
 					if(crtajTrakt1) {
 						offset = gridOffset1;
 						zoom = zoom1;
+						crtaj = pictureRight !=null;
 					}
-					activeMarker.pojave.Add(Event.current.mousePosition/zoom +offset);
+					if(crtaj) activeMarker.pojave.Add(Event.current.mousePosition/zoom -offset/zoom);
 				}
 			}
 
@@ -229,11 +255,11 @@ public class ZilaGUI : MonoBehaviour {
 
 			if(Event.current.isMouse && Event.current.button == 1){
 				drawEraser = true;
-				GiTrakt trakt = trenutni.trakt2;
+				//GiTrakt trakt = trenutni.trakt2;
 				Vector2 gridOffset = gridOffset2;
 				float zoom = zoom2;
 				if(crtajTrakt1){
-					trakt = trenutni.trakt1;
+					//trakt = trenutni.trakt1;
 					gridOffset = gridOffset1;
 					zoom = zoom1;
 				}
@@ -269,7 +295,8 @@ public class ZilaGUI : MonoBehaviour {
 		{
 			GUILayout.BeginArea(load);
 
-			RefreshStorageFileInfo();
+			RefreshStorageFileInfo(Application.streamingAssetsPath, "*.zile");
+			scroll2 = GUILayout.BeginScrollView(scroll2);
 			foreach (FileInfo f in fileInfo){
 				GUIStyle style = GUI.skin.button;
 				if(f.Name == trenutni.name) style = GUI.skin.box;
@@ -288,11 +315,12 @@ public class ZilaGUI : MonoBehaviour {
 			}
 			GUILayout.Label("");
 			if(GUILayout.Button("novi")){
+				pictureLeft = null;
+				pictureRight = null;
 				trenutni = null;
 				Save();
-				Debug.Log("trenu"+trenutni.name);
-
 			}
+			GUILayout.EndScrollView();
 			GUILayout.EndArea();
 		}
 		//GUI.Box(inicijali, "");
@@ -309,7 +337,7 @@ public class ZilaGUI : MonoBehaviour {
 		bool existsInFolder = false;
 
 		if(trenutni ==null){
-			RefreshStorageFileInfo();
+			RefreshStorageFileInfo(Application.streamingAssetsPath, "*.zile");
 			foreach (FileInfo f in fileInfo){
 				Load(f.Name);
 
@@ -329,18 +357,24 @@ public class ZilaGUI : MonoBehaviour {
 			omjeri = Omjeri(trenutni.trakt1, trenutni.trakt2);
 		}
 
-		RefreshStorageFileInfo();
+		RefreshStorageFileInfo(Application.streamingAssetsPath, "*.zile");
 		foreach (FileInfo f in fileInfo){
 			if(f.Name == trenutni.name) existsInFolder = true;
 		}
 		if(existsInFolder ==false) trenutni = null;
 	}
 	
-	void RefreshStorageFileInfo(){
-		string myPath = Application.streamingAssetsPath;
-		if(Directory.Exists(myPath) ==false) Directory.CreateDirectory(myPath);
+	void RefreshStorageFileInfo(string myPath, string filePattern = "*", bool createIfDontExist = true){
+		//string myPath = Application.streamingAssetsPath;
+		if(Directory.Exists(myPath) ==false){
+			if(createIfDontExist) Directory.CreateDirectory(myPath);
+			else{
+				fileInfo = new FileInfo[0];
+				return;
+			}
+		}
 		DirectoryInfo dir = new DirectoryInfo(myPath);
-		fileInfo = dir.GetFiles("*.zile");
+		fileInfo = dir.GetFiles(filePattern);
 	}
 	
 	#region non-GUI
@@ -571,6 +605,7 @@ public class ZilaGUI : MonoBehaviour {
 	
 	void OmjerGUI(List<float> omjeri){
 		GUILayout.BeginVertical();
+		GUILayout.Label("");	//
 		GUILayout.Label("");	//tip
 		GUILayout.Label("");	//ime
 		GUILayout.Label("");	//zbroj
