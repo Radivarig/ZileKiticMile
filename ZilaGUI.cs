@@ -238,11 +238,11 @@ public class ZilaGUI : MonoBehaviour {
 					if(activeMarker.notHidden ==false) activeMarker.notHidden = true;
 					Vector2 offset = gridOffset2;
 					float zoom = zoom2;
-					bool crtaj = pictureLeft !=null;
+					bool crtaj = pictureRight !=null;
 					if(crtajTrakt1) {
 						offset = gridOffset1;
 						zoom = zoom1;
-						crtaj = pictureRight !=null;
+						crtaj = pictureLeft !=null;
 					}
 					if(crtaj) activeMarker.pojave.Add(Event.current.mousePosition/zoom -offset/zoom);
 				}
