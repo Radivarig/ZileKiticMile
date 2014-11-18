@@ -201,8 +201,8 @@ public class ZilaGUI : MonoBehaviour {
 					if(f.Name.EndsWith(".meta") ==false)
 					{
 						if(GUILayout.Button(f.Name)){
-							trenutni.pictureLeftPath = searchPath+ "/" +f.Name;
-							pictureLeft = LoadImage(trenutni.pictureLeftPath);
+							trenutni.pictureLeftPath = f.Name;
+							pictureLeft = LoadImage(searchPath +"/" +trenutni.pictureLeftPath);
 						}
 					}	
 				}
@@ -216,8 +216,8 @@ public class ZilaGUI : MonoBehaviour {
 					if(f.Name.EndsWith(".meta") ==false)
 					{
 						if(GUILayout.Button(f.Name)){
-						trenutni.pictureRightPath = searchPath+ "/" +f.Name;
-						pictureRight = LoadImage(trenutni.pictureRightPath);
+						trenutni.pictureRightPath = f.Name;
+						pictureRight = LoadImage( searchPath +"/" +trenutni.pictureRightPath);
 						}
 					}
 				}
@@ -391,41 +391,34 @@ public class ZilaGUI : MonoBehaviour {
 		return tex;
 	}	
 
+	string FolderDateName(string ext = ""){
+		string day = System.DateTime.Now.Day.ToString();		if (day.Length == 1) day = "0" +day;
+		string month = System.DateTime.Now.Month.ToString();	if (month.Length == 1) month = "0" +month;
+		string year = System.DateTime.Now.Year.ToString().Substring(2);
+		string hour = System.DateTime.Now.Hour.ToString();		if (hour.Length == 1) hour = "0" +hour;
+		string minute = System.DateTime.Now.Minute.ToString();	if (minute.Length == 1) minute = "0" +minute;
+		string second = System.DateTime.Now.Second.ToString();	if (second.Length == 1) second = "0" +second;
+		string milisec = System.DateTime.Now.Millisecond.ToString();
+		if (milisec.Length == 2) milisec = "0" +milisec;
+		if (milisec.Length == 1) milisec = "00" +milisec;
+		
+		string[] date = { day, month, year, hour, minute, second, milisec };
+		
+		return string.Join ("-", date) + "." +ext;
+	}
+	
 	void Save(string fname = ""){
 		if(trenutni == null)
 			trenutni = new Project();
-
 		trenutni.UpdateAllPojaveXY();
-		string basePath =  Application.streamingAssetsPath;
-		if (fname == "") {
-			string day = System.DateTime.Now.Day.ToString();
-			if (day.Length == 1) day = "0" +day;
 
-			string month = System.DateTime.Now.Month.ToString();
-			if (month.Length == 1) month = "0" +month;
-
-			string year = System.DateTime.Now.Year.ToString().Substring(2);
-
-			string hour = System.DateTime.Now.Hour.ToString();
-			if (hour.Length == 1) hour = "0" +hour;
-
-			string minute = System.DateTime.Now.Minute.ToString();
-			if (minute.Length == 1) minute = "0" +minute;
-
-			string second = System.DateTime.Now.Second.ToString();
-			if (second.Length == 1) second = "0" +second;
-
-			string milisec = System.DateTime.Now.Millisecond.ToString();
-			if (milisec.Length == 2) milisec = "0" +milisec;
-			if (milisec.Length == 1) milisec = "00" +milisec;
-
-			string[] date = { day, month, year, hour, minute, second, milisec };
-
-			fname = string.Join ("-", date) + ".zile";
-		}
+		Debug.Log(trenutni.pictureLeftPath);
+		Debug.Log(trenutni.pictureRightPath);
+		if (fname == "") fname = FolderDateName("zile");
 		trenutni.name = fname;
-
+		string basePath =  Application.streamingAssetsPath;
 		string fullPath = basePath +"/" +fname;
+
 		BinaryFormatter bf = new BinaryFormatter();
 		FileStream fs = File.Create (fullPath);
 		bf.Serialize(fs, trenutni);
@@ -446,8 +439,8 @@ public class ZilaGUI : MonoBehaviour {
 		if (trenutni !=null){
 			trenutni.UpdateAllPojave();
 			trenutni.name = fname;
-			pictureLeft = LoadImage(trenutni.pictureLeftPath);
-			pictureRight = LoadImage(trenutni.pictureRightPath);
+			pictureLeft = LoadImage(searchPath +"/" +trenutni.pictureLeftPath);
+			pictureRight = LoadImage(searchPath +"/" +trenutni.pictureRightPath);
 		}
 		else {
 			//TODO neccessery?
